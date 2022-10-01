@@ -5,7 +5,7 @@
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
 _pass_complete_entries () {
-	local prefix="${PASSWORD_STORE_DIR:-$HOME/.password-store/}"
+	local prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
 	local suffix=".gpg"
 	local autoexpand=${1:-0}
@@ -59,7 +59,7 @@ _pass_complete_entries () {
 }
 
 _pass_complete_folders () {
-	local prefix="${PASSWORD_STORE_DIR:-$HOME/.password-store/}"
+	local prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
 
 	local IFS=$'\n'
@@ -126,14 +126,14 @@ _pass()
 		esac
 
 		# To add completion for an extension command define a function like this:
-		# __password_store_extension_complete_<COMMAND>() {
+		# __quiz_store_extension_complete_<COMMAND>() {
 		#     COMPREPLY+=($(compgen -W "-o --option" -- ${cur}))
 		#     _pass_complete_entries 1
 		# }
 		#
 		# and add the command to the $PASSWORD_STORE_EXTENSION_COMMANDS array
-		if [[ " ${PASSWORD_STORE_EXTENSION_COMMANDS[*]} " == *" ${COMP_WORDS[1]} "* ]] && type "__password_store_extension_complete_${COMP_WORDS[1]}" &> /dev/null; then
-			"__password_store_extension_complete_${COMP_WORDS[1]}"
+		if [[ " ${PASSWORD_STORE_EXTENSION_COMMANDS[*]} " == *" ${COMP_WORDS[1]} "* ]] && type "__quiz_store_extension_complete_${COMP_WORDS[1]}" &> /dev/null; then
+			"__quiz_store_extension_complete_${COMP_WORDS[1]}"
 		fi
 	else
 		COMPREPLY+=($(compgen -W "${commands}" -- ${cur}))

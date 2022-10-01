@@ -2,7 +2,7 @@
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
 clip() {
-	local sleep_argv0="password store sleep for user $(id -u)"
+	local sleep_argv0="quiz store sleep for user $(id -u)"
 	pkill -f "^$sleep_argv0" 2>/dev/null && sleep 0.5
 	local before="$(pbpaste | $BASE64)"
 	echo -n "$1" | pbcopy
