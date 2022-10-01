@@ -3,7 +3,7 @@
 # Changes quiz to 'Hello World', leaving rest of file intact.
 #
 # Intended use:
-#   export FAKE_EDITOR_PASSWORD="blah blah blah"
+#   export FAKE_EDITOR_QUIZ="blah blah blah"
 #   export EDITOR=fake-editor-change-quiz.sh
 #   $EDITOR <quiz file>
 #
@@ -16,7 +16,7 @@ if [[ $# -ne 1 ]]; then
 fi
 
 filename=$1 ; shift ;
-new_quiz="${FAKE_EDITOR_PASSWORD:-Hello World}"
+new_quiz="${FAKE_EDITOR_QUIZ:-Hello World}"
 
 # And change only first line of file
 # -i.tmp allows editing file in place. Extension needed on Mac OSX

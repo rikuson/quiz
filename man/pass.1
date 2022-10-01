@@ -1,4 +1,4 @@
-.TH PASS 1 "2022 October 2" Riku Takeuchi "Quiz Store"
+.TH QUIZ 1 "2022 October 2" Riku Takeuchi "Quiz Store"
 
 .SH NAME
 quiz - stores, retrieves, generates, and synchronizes quizzes securely
@@ -30,7 +30,7 @@ If no COMMAND is specified, COMMAND defaults to either
 .B show
 or
 .BR ls ,
-depending on the type of specifier in ARGS. Alternatively, if \fIPASSWORD_STORE_ENABLE_EXTENSIONS\fP
+depending on the type of specifier in ARGS. Alternatively, if \fIQUIZ_STORE_ENABLE_EXTENSIONS\fP
 is set to "true", and the file \fI.extensions/COMMAND.bash\fP exists inside the
 quiz store and is executable, then it is sourced into the environment,
 passing any arguments and environment variables. Extensions existing in a
@@ -101,7 +101,7 @@ line to the clipboard using
 .BR xclip (1)
 or
 .BR wl-clipboard(1)
-and then restore the clipboard after 45 (or \fIPASSWORD_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
+and then restore the clipboard after 45 (or \fIQUIZ_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
 or \fI-q\fP is specified, do not print the quiz but instead display a QR code using
 .BR qrencode (1)
 either to the terminal or graphically if supported.
@@ -126,17 +126,17 @@ the ordinary \fITMPDIR\fP location, and print a warning.
 .TP
 \fBgenerate\fP [ \fI--no-symbols\fP, \fI-n\fP ] [ \fI--clip\fP, \fI-c\fP ] [ \fI--in-place\fP, \fI-i\fP | \fI--force\fP, \fI-f\fP ] \fIquiz-name [quiz-length]\fP
 Generate a new quiz using \fB/dev/urandom\fP of length \fIquiz-length\fP
-(or \fIPASSWORD_STORE_GENERATED_LENGTH\fP if unspecified) and insert into
+(or \fIQUIZ_STORE_GENERATED_LENGTH\fP if unspecified) and insert into
 \fIquiz-name\fP. If \fI--no-symbols\fP or \fI-n\fP is specified, do not use
 any non-alphanumeric characters in the generated quiz. The character sets used
-in generating quizzes can be changed with the \fIPASSWORD_STORE_CHARACTER_SET\fP and
-\fIPASSWORD_STORE_CHARACTER_SET_NO_SYMBOLS\fP environment variables, described below.
+in generating quizzes can be changed with the \fIQUIZ_STORE_CHARACTER_SET\fP and
+\fIQUIZ_STORE_CHARACTER_SET_NO_SYMBOLS\fP environment variables, described below.
 If \fI--clip\fP or \fI-c\fP is specified, do not print the quiz but instead copy
 it to the clipboard using
 .BR xclip (1)
 or
 .BR wl-clipboard(1)
-and then restore the clipboard after 45 (or \fIPASSWORD_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
+and then restore the clipboard after 45 (or \fIQUIZ_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
 or \fI-q\fP is specified, do not print the quiz but instead display a QR code using
 .BR qrencode (1)
 either to the terminal or graphically if supported. Prompt before overwriting an existing quiz,
@@ -409,54 +409,54 @@ The directory containing extension files.
 .SH ENVIRONMENT VARIABLES
 
 .TP
-.I PASSWORD_STORE_DIR
+.I QUIZ_STORE_DIR
 Overrides the default quiz storage directory.
 .TP
-.I PASSWORD_STORE_KEY
+.I QUIZ_STORE_KEY
 Overrides the default gpg key identification set by \fBinit\fP. Keys must not
 contain spaces and thus use of the hexadecimal key signature is recommended.
 Multiple keys may be specified separated by spaces. 
 .TP
-.I PASSWORD_STORE_GPG_OPTS
+.I QUIZ_STORE_GPG_OPTS
 Additional options to be passed to all invocations of GPG.
 .TP
-.I PASSWORD_STORE_X_SELECTION
+.I QUIZ_STORE_X_SELECTION
 Overrides the selection passed to \fBxclip\fP, by default \fIclipboard\fP. See
 .BR xclip (1)
 for more info.
 .TP
-.I PASSWORD_STORE_CLIP_TIME
+.I QUIZ_STORE_CLIP_TIME
 Specifies the number of seconds to wait before restoring the clipboard, by default
 \fI45\fP seconds.
 .TP
-.I PASSWORD_STORE_UMASK
+.I QUIZ_STORE_UMASK
 Sets the umask of all files modified by quiz, by default \fI077\fP.
 .TP
-.I PASSWORD_STORE_GENERATED_LENGTH
+.I QUIZ_STORE_GENERATED_LENGTH
 The default quiz length if the \fIquiz-length\fP parameter to \fBgenerate\fP
 is unspecified.
 .TP
-.I PASSWORD_STORE_CHARACTER_SET
+.I QUIZ_STORE_CHARACTER_SET
 The character set to be used in quiz generation for \fBgenerate\fP. This value
 is to be interpreted by \fBtr\fP. See
 .BR tr (1)
 for more info.
 .TP
-.I PASSWORD_STORE_CHARACTER_SET_NO_SYMBOLS
+.I QUIZ_STORE_CHARACTER_SET_NO_SYMBOLS
 The character set to be used in no-symbol quiz generation for \fBgenerate\fP,
 when \fI--no-symbols\fP, \fI-n\fP is specified. This value is to be interpreted
 by \fBtr\fP. See
 .BR tr (1)
 for more info.
 .TP
-.I PASSWORD_STORE_ENABLE_EXTENSIONS
+.I QUIZ_STORE_ENABLE_EXTENSIONS
 This environment variable must be set to "true" for extensions to be enabled.
 .TP
-.I PASSWORD_STORE_EXTENSIONS_DIR
+.I QUIZ_STORE_EXTENSIONS_DIR
 The location to look for executable extension files, by default
-\fIPASSWORD_STORE_DIR/.extensions\fP.
+\fIQUIZ_STORE_DIR/.extensions\fP.
 .TP
-.I PASSWORD_STORE_SIGNING_KEY
+.I QUIZ_STORE_SIGNING_KEY
 If this environment variable is set, then all \fB.gpg-id\fP files and non-system extension files
 must be signed using a detached signature using the GPG key specified by the full 40 character
 upper-case fingerprint in this variable. If multiple fingerprints are specified, each

@@ -4,8 +4,8 @@
 set -l PROG 'quiz'
 
 function __fish_quiz_get_prefix
-    if set -q PASSWORD_STORE_DIR
-        realpath -- "$PASSWORD_STORE_DIR"
+    if set -q QUIZ_STORE_DIR
+        realpath -- "$QUIZ_STORE_DIR"
     else
         echo "$HOME/.quiz-store"
     end

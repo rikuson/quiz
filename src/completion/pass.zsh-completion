@@ -14,7 +14,7 @@
 # compdef _quiz workquiz
 # zstyle ':completion::complete:workquiz::' prefix "$HOME/work/quiz"
 # workquiz() {
-#   PASSWORD_STORE_DIR=$HOME/work/quiz quiz $@
+#   QUIZ_STORE_DIR=$HOME/work/quiz quiz $@
 # }
 
 
@@ -123,7 +123,7 @@ _quiz_cmd_show () {
 _quiz_complete_entries_helper () {
 	local IFS=$'\n'
 	local prefix
-	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store}"
+	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store}"
 	_values -C 'quizzes' ${$(find -L "$prefix" \( -name .git -o -name .gpg-id \) -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.gpg##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
 }
 

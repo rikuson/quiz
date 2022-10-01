@@ -5,7 +5,7 @@
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
 _quiz_complete_entries () {
-	local prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store/}"
+	local prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
 	local suffix=".gpg"
 	local autoexpand=${1:-0}
@@ -59,7 +59,7 @@ _quiz_complete_entries () {
 }
 
 _quiz_complete_folders () {
-	local prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store/}"
+	local prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
 
 	local IFS=$'\n'
@@ -84,7 +84,7 @@ _quiz()
 {
 	COMPREPLY=()
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local commands="init ls find grep show insert generate edit rm mv cp git help version ${PASSWORD_STORE_EXTENSION_COMMANDS[*]}"
+	local commands="init ls find grep show insert generate edit rm mv cp git help version ${QUIZ_STORE_EXTENSION_COMMANDS[*]}"
 	if [[ $COMP_CWORD -gt 1 ]]; then
 		local lastarg="${COMP_WORDS[$COMP_CWORD-1]}"
 		case "${COMP_WORDS[1]}" in
@@ -131,8 +131,8 @@ _quiz()
 		#     _quiz_complete_entries 1
 		# }
 		#
-		# and add the command to the $PASSWORD_STORE_EXTENSION_COMMANDS array
-		if [[ " ${PASSWORD_STORE_EXTENSION_COMMANDS[*]} " == *" ${COMP_WORDS[1]} "* ]] && type "__quiz_store_extension_complete_${COMP_WORDS[1]}" &> /dev/null; then
+		# and add the command to the $QUIZ_STORE_EXTENSION_COMMANDS array
+		if [[ " ${QUIZ_STORE_EXTENSION_COMMANDS[*]} " == *" ${COMP_WORDS[1]} "* ]] && type "__quiz_store_extension_complete_${COMP_WORDS[1]}" &> /dev/null; then
 			"__quiz_store_extension_complete_${COMP_WORDS[1]}"
 		fi
 	else

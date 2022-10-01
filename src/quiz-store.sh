@@ -3,22 +3,22 @@
 # Copyright (C) 2012 - 2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
-umask "${PASSWORD_STORE_UMASK:-077}"
+umask "${QUIZ_STORE_UMASK:-077}"
 set -o pipefail
 
-GPG_OPTS=( $PASSWORD_STORE_GPG_OPTS "--quiet" "--yes" "--compress-algo=none" "--no-encrypt-to" )
+GPG_OPTS=( $QUIZ_STORE_GPG_OPTS "--quiet" "--yes" "--compress-algo=none" "--no-encrypt-to" )
 GPG="gpg"
 export GPG_TTY="${GPG_TTY:-$(tty 2>/dev/null)}"
 command -v gpg2 &>/dev/null && GPG="gpg2"
 [[ -n $GPG_AGENT_INFO || $GPG == "gpg2" ]] && GPG_OPTS+=( "--batch" "--use-agent" )
 
-PREFIX="${PASSWORD_STORE_DIR:-$HOME/.quiz-store}"
-EXTENSIONS="${PASSWORD_STORE_EXTENSIONS_DIR:-$PREFIX/.extensions}"
-X_SELECTION="${PASSWORD_STORE_X_SELECTION:-clipboard}"
-CLIP_TIME="${PASSWORD_STORE_CLIP_TIME:-45}"
-GENERATED_LENGTH="${PASSWORD_STORE_GENERATED_LENGTH:-25}"
-CHARACTER_SET="${PASSWORD_STORE_CHARACTER_SET:-[:punct:][:alnum:]}"
-CHARACTER_SET_NO_SYMBOLS="${PASSWORD_STORE_CHARACTER_SET_NO_SYMBOLS:-[:alnum:]}"
+PREFIX="${QUIZ_STORE_DIR:-$HOME/.quiz-store}"
+EXTENSIONS="${QUIZ_STORE_EXTENSIONS_DIR:-$PREFIX/.extensions}"
+X_SELECTION="${QUIZ_STORE_X_SELECTION:-clipboard}"
+CLIP_TIME="${QUIZ_STORE_CLIP_TIME:-45}"
+GENERATED_LENGTH="${QUIZ_STORE_GENERATED_LENGTH:-25}"
+CHARACTER_SET="${QUIZ_STORE_CHARACTER_SET:-[:punct:][:alnum:]}"
+CHARACTER_SET_NO_SYMBOLS="${QUIZ_STORE_CHARACTER_SET_NO_SYMBOLS:-[:alnum:]}"
 
 unset GIT_DIR GIT_WORK_TREE GIT_NAMESPACE GIT_INDEX_FILE GIT_INDEX_VERSION GIT_OBJECT_DIRECTORY GIT_COMMON_DIR
 export GIT_CEILING_DIRECTORIES="$PREFIX/.."
@@ -57,11 +57,11 @@ die() {
 	exit 1
 }
 verify_file() {
-	[[ -n $PASSWORD_STORE_SIGNING_KEY ]] || return 0
+	[[ -n $QUIZ_STORE_SIGNING_KEY ]] || return 0
 	[[ -f $1.sig ]] || die "Signature for $1 does not exist."
-	local fingerprints="$($GPG $PASSWORD_STORE_GPG_OPTS --verify --status-fd=1 "$1.sig" "$1" 2>/dev/null | sed -n 's/^\[GNUPG:\] VALIDSIG \([A-F0-9]\{40\}\) .* \([A-F0-9]\{40\}\)$/\1\n\2/p')"
+	local fingerprints="$($GPG $QUIZ_STORE_GPG_OPTS --verify --status-fd=1 "$1.sig" "$1" 2>/dev/null | sed -n 's/^\[GNUPG:\] VALIDSIG \([A-F0-9]\{40\}\) .* \([A-F0-9]\{40\}\)$/\1\n\2/p')"
 	local fingerprint found=0
-	for fingerprint in $PASSWORD_STORE_SIGNING_KEY; do
+	for fingerprint in $QUIZ_STORE_SIGNING_KEY; do
 		[[ $fingerprint =~ ^[A-F0-9]{40}$ ]] || continue
 		[[ $fingerprints == *$fingerprint* ]] && { found=1; break; }
 	done
@@ -72,8 +72,8 @@ set_gpg_recipients() {
 	GPG_RECIPIENTS=( )
 	local gpg_id
 
-	if [[ -n $PASSWORD_STORE_KEY ]]; then
-		for gpg_id in $PASSWORD_STORE_KEY; do
+	if [[ -n $QUIZ_STORE_KEY ]]; then
+		for gpg_id in $QUIZ_STORE_KEY; do
 			GPG_RECIPIENT_ARGS+=( "-r" "$gpg_id" )
 			GPG_RECIPIENTS+=( "$gpg_id" )
 		done
@@ -109,7 +109,7 @@ set_gpg_recipients() {
 
 reencrypt_path() {
 	local prev_gpg_recipients="" gpg_keys="" current_keys="" index quizfile
-	local groups="$($GPG $PASSWORD_STORE_GPG_OPTS --list-config --with-colons | grep "^cfg:group:.*")"
+	local groups="$($GPG $QUIZ_STORE_GPG_OPTS --list-config --with-colons | grep "^cfg:group:.*")"
 	while read -r -d "" quizfile; do
 		[[ -L $quizfile ]] && continue
 		local quizfile_dir="${quizfile%/*}"
@@ -127,9 +127,9 @@ reencrypt_path() {
 				IFS=";" eval 'GPG_RECIPIENTS+=( $group )' # http://unix.stackexchange.com/a/92190
 				unset "GPG_RECIPIENTS[$index]"
 			done
-			gpg_keys="$($GPG $PASSWORD_STORE_GPG_OPTS --list-keys --with-colons "${GPG_RECIPIENTS[@]}" | sed -n 's/^sub:[^idr:]*:[^:]*:[^:]*:\([^:]*\):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*/\1/p' | LC_ALL=C sort -u)"
+			gpg_keys="$($GPG $QUIZ_STORE_GPG_OPTS --list-keys --with-colons "${GPG_RECIPIENTS[@]}" | sed -n 's/^sub:[^idr:]*:[^:]*:[^:]*:\([^:]*\):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*/\1/p' | LC_ALL=C sort -u)"
 		fi
-		current_keys="$(LC_ALL=C $GPG $PASSWORD_STORE_GPG_OPTS -v --no-secmem-warning --no-permission-warning --decrypt --list-only --keyid-format long "$quizfile" 2>&1 | sed -nE 's/^gpg: public key is ([A-F0-9]+)$/\1/p' | LC_ALL=C sort -u)"
+		current_keys="$(LC_ALL=C $GPG $QUIZ_STORE_GPG_OPTS -v --no-secmem-warning --no-permission-warning --decrypt --list-only --keyid-format long "$quizfile" 2>&1 | sed -nE 's/^gpg: public key is ([A-F0-9]+)$/\1/p' | LC_ALL=C sort -u)"
 
 		if [[ $gpg_keys != "$current_keys" ]]; then
 			echo "$quizfile_display: reencrypting to ${gpg_keys//$'\n'/ }"
@@ -349,9 +349,9 @@ cmd_init() {
 		local id_print="$(printf "%s, " "$@")"
 		echo "Quiz store initialized for ${id_print%, }${id_path:+ ($id_path)}"
 		git_add_file "$gpg_id" "Set GPG id to ${id_print%, }${id_path:+ ($id_path)}."
-		if [[ -n $PASSWORD_STORE_SIGNING_KEY ]]; then
+		if [[ -n $QUIZ_STORE_SIGNING_KEY ]]; then
 			local signing_keys=( ) key
-			for key in $PASSWORD_STORE_SIGNING_KEY; do
+			for key in $QUIZ_STORE_SIGNING_KEY; do
 				signing_keys+=( --default-key $key )
 			done
 			$GPG "${GPG_OPTS[@]}" "${signing_keys[@]}" --detach-sign "$gpg_id" || die "Could not sign .gpg_id."
@@ -681,7 +681,7 @@ cmd_extension() {
 	check_sneaky_paths "$1"
 	local user_extension system_extension extension
 	[[ -n $SYSTEM_EXTENSION_DIR ]] && system_extension="$SYSTEM_EXTENSION_DIR/$1.bash"
-	[[ $PASSWORD_STORE_ENABLE_EXTENSIONS == true ]] && user_extension="$EXTENSIONS/$1.bash"
+	[[ $QUIZ_STORE_ENABLE_EXTENSIONS == true ]] && user_extension="$EXTENSIONS/$1.bash"
 	if [[ -n $user_extension && -f $user_extension && -x $user_extension ]]; then
 		verify_file "$user_extension"
 		extension="$user_extension"

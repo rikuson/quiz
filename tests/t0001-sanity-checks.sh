@@ -5,13 +5,13 @@ cd "$(dirname "$0")"
 . ./setup.sh
 
 test_expect_success 'Make sure we can run quiz' '
-	"$PASS" --help | grep "quiz: the standard unix quiz manager"
+	"$QUIZ" --help | grep "quiz: the standard unix quiz manager"
 '
 
 test_expect_success 'Make sure we can initialize our test store' '
-	"$PASS" init $KEY1 &&
-	[[ -e "$PASSWORD_STORE_DIR/.gpg-id" ]] &&
-	[[ $(cat "$PASSWORD_STORE_DIR/.gpg-id") == "$KEY1" ]]
+	"$QUIZ" init $KEY1 &&
+	[[ -e "$QUIZ_STORE_DIR/.gpg-id" ]] &&
+	[[ $(cat "$QUIZ_STORE_DIR/.gpg-id") == "$KEY1" ]]
 '
 
 test_done

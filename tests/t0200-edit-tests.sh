@@ -5,13 +5,13 @@ cd "$(dirname "$0")"
 . ./setup.sh
 
 test_expect_success 'Test "edit" command' '
-	"$PASS" init $KEY1 &&
-	"$PASS" generate cred1 90 &&
-	export FAKE_EDITOR_PASSWORD="big fat fake quiz" &&
+	"$QUIZ" init $KEY1 &&
+	"$QUIZ" generate cred1 90 &&
+	export FAKE_EDITOR_QUIZ="big fat fake quiz" &&
 	export PATH="$TEST_HOME:$PATH"
 	export EDITOR="fake-editor-change-quiz.sh" &&
-	"$PASS" edit cred1 &&
-	[[ $("$PASS" show cred1) == "$FAKE_EDITOR_PASSWORD" ]]
+	"$QUIZ" edit cred1 &&
+	[[ $("$QUIZ" show cred1) == "$FAKE_EDITOR_QUIZ" ]]
 '
 
 test_done
