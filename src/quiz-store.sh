@@ -43,7 +43,7 @@ git_add_file() {
 git_commit() {
 	local sign=""
 	[[ -n $INNER_GIT_DIR ]] || return
-	[[ $(git -C "$INNER_GIT_DIR" config --bool --get pass.signcommits) == "true" ]] && sign="-S"
+	[[ $(git -C "$INNER_GIT_DIR" config --bool --get quiz.signcommits) == "true" ]] && sign="-S"
 	git -C "$INNER_GIT_DIR" commit $sign -m "$1"
 }
 yesno() {
@@ -108,18 +108,18 @@ set_gpg_recipients() {
 }
 
 reencrypt_path() {
-	local prev_gpg_recipients="" gpg_keys="" current_keys="" index passfile
+	local prev_gpg_recipients="" gpg_keys="" current_keys="" index quizfile
 	local groups="$($GPG $PASSWORD_STORE_GPG_OPTS --list-config --with-colons | grep "^cfg:group:.*")"
-	while read -r -d "" passfile; do
-		[[ -L $passfile ]] && continue
-		local passfile_dir="${passfile%/*}"
-		passfile_dir="${passfile_dir#$PREFIX}"
-		passfile_dir="${passfile_dir#/}"
-		local passfile_display="${passfile#$PREFIX/}"
-		passfile_display="${passfile_display%.gpg}"
-		local passfile_temp="${passfile}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
+	while read -r -d "" quizfile; do
+		[[ -L $quizfile ]] && continue
+		local quizfile_dir="${quizfile%/*}"
+		quizfile_dir="${quizfile_dir#$PREFIX}"
+		quizfile_dir="${quizfile_dir#/}"
+		local quizfile_display="${quizfile#$PREFIX/}"
+		quizfile_display="${quizfile_display%.gpg}"
+		local quizfile_temp="${quizfile}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
 
-		set_gpg_recipients "$passfile_dir"
+		set_gpg_recipients "$quizfile_dir"
 		if [[ $prev_gpg_recipients != "${GPG_RECIPIENTS[*]}" ]]; then
 			for index in "${!GPG_RECIPIENTS[@]}"; do
 				local group="$(sed -n "s/^cfg:group:$(sed 's/[\/&]/\\&/g' <<<"${GPG_RECIPIENTS[$index]}"):\\(.*\\)\$/\\1/p" <<<"$groups" | head -n 1)"
@@ -129,12 +129,12 @@ reencrypt_path() {
 			done
 			gpg_keys="$($GPG $PASSWORD_STORE_GPG_OPTS --list-keys --with-colons "${GPG_RECIPIENTS[@]}" | sed -n 's/^sub:[^idr:]*:[^:]*:[^:]*:\([^:]*\):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*/\1/p' | LC_ALL=C sort -u)"
 		fi
-		current_keys="$(LC_ALL=C $GPG $PASSWORD_STORE_GPG_OPTS -v --no-secmem-warning --no-permission-warning --decrypt --list-only --keyid-format long "$passfile" 2>&1 | sed -nE 's/^gpg: public key is ([A-F0-9]+)$/\1/p' | LC_ALL=C sort -u)"
+		current_keys="$(LC_ALL=C $GPG $PASSWORD_STORE_GPG_OPTS -v --no-secmem-warning --no-permission-warning --decrypt --list-only --keyid-format long "$quizfile" 2>&1 | sed -nE 's/^gpg: public key is ([A-F0-9]+)$/\1/p' | LC_ALL=C sort -u)"
 
 		if [[ $gpg_keys != "$current_keys" ]]; then
-			echo "$passfile_display: reencrypting to ${gpg_keys//$'\n'/ }"
-			$GPG -d "${GPG_OPTS[@]}" "$passfile" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile_temp" "${GPG_OPTS[@]}" &&
-			mv "$passfile_temp" "$passfile" || rm -f "$passfile_temp"
+			echo "$quizfile_display: reencrypting to ${gpg_keys//$'\n'/ }"
+			$GPG -d "${GPG_OPTS[@]}" "$quizfile" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile_temp" "${GPG_OPTS[@]}" &&
+			mv "$quizfile_temp" "$quizfile" || rm -f "$quizfile_temp"
 		fi
 		prev_gpg_recipients="${GPG_RECIPIENTS[*]}"
 	done < <(find "$1" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.gpg' -print0)
@@ -142,7 +142,7 @@ reencrypt_path() {
 check_sneaky_paths() {
 	local path
 	for path in "$@"; do
-		[[ $path =~ /\.\.$ || $path =~ ^\.\./ || $path =~ /\.\./ || $path =~ ^\.\.$ ]] && die "Error: You've attempted to pass a sneaky path to pass. Go home."
+		[[ $path =~ /\.\.$ || $path =~ ^\.\./ || $path =~ /\.\./ || $path =~ ^\.\.$ ]] && die "Error: You've attempted to quiz a sneaky path to quiz. Go home."
 	done
 }
 
@@ -200,13 +200,13 @@ clip() {
 qrcode() {
 	if [[ -n $DISPLAY || -n $WAYLAND_DISPLAY ]]; then
 		if type feh >/dev/null 2>&1; then
-			echo -n "$1" | qrencode --size 10 -o - | feh -x --title "pass: $2" -g +200+200 -
+			echo -n "$1" | qrencode --size 10 -o - | feh -x --title "quiz: $2" -g +200+200 -
 			return
 		elif type gm >/dev/null 2>&1; then
-			echo -n "$1" | qrencode --size 10 -o - | gm display -title "pass: $2" -geometry +200+200 -
+			echo -n "$1" | qrencode --size 10 -o - | gm display -title "quiz: $2" -geometry +200+200 -
 			return
 		elif type display >/dev/null 2>&1; then
-			echo -n "$1" | qrencode --size 10 -o - | display -title "pass: $2" -geometry +200+200 -
+			echo -n "$1" | qrencode --size 10 -o - | display -title "quiz: $2" -geometry +200+200 -
 			return
 		fi
 	fi
@@ -228,7 +228,7 @@ tmpdir() {
 		[[ $warn -eq 1 ]] && yesno "$(cat <<-_EOF
 		Your system does not have /dev/shm, which means that it may
 		be difficult to entirely erase the temporary non-encrypted
-		password file after editing.
+		quiz file after editing.
 
 		Are you sure you would like to continue?
 		_EOF
@@ -260,7 +260,7 @@ source "$(dirname "$0")/platform/$(uname | cut -d _ -f 1 | tr '[:upper:]' '[:low
 cmd_version() {
 	cat <<-_EOF
 	============================================
-	= pass: the standard unix password manager =
+	= quiz: the standard unix quiz manager =
 	=                                          =
 	=                  v1.7.4                  =
 	=                                          =
@@ -278,30 +278,30 @@ cmd_usage() {
 	cat <<-_EOF
 	Usage:
 	    $PROGRAM init [--path=subfolder,-p subfolder] gpg-id...
-	        Initialize new password storage and use gpg-id for encryption.
-	        Selectively reencrypt existing passwords using new gpg-id.
+	        Initialize new quiz storage and use gpg-id for encryption.
+	        Selectively reencrypt existing quizzes using new gpg-id.
 	    $PROGRAM [ls] [subfolder]
-	        List passwords.
-	    $PROGRAM find pass-names...
-	    	List passwords that match pass-names.
-	    $PROGRAM [show] [--clip[=line-number],-c[line-number]] pass-name
-	        Show existing password and optionally put it on the clipboard.
+	        List quizzes.
+	    $PROGRAM find quiz-names...
+	    	List quizzes that match quiz-names.
+	    $PROGRAM [show] [--clip[=line-number],-c[line-number]] quiz-name
+	        Show existing quiz and optionally put it on the clipboard.
 	        If put on the clipboard, it will be cleared in $CLIP_TIME seconds.
 	    $PROGRAM grep [GREPOPTIONS] search-string
-	        Search for password files containing search-string when decrypted.
-	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] pass-name
-	        Insert new password. Optionally, echo the password back to the console
+	        Search for quiz files containing search-string when decrypted.
+	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] quiz-name
+	        Insert new quiz. Optionally, echo the quiz back to the console
 	        during entry. Or, optionally, the entry may be multiline. Prompt before
-	        overwriting existing password unless forced.
-	    $PROGRAM edit pass-name
-	        Insert a new password or edit an existing password using ${EDITOR:-vi}.
-	    $PROGRAM generate [--no-symbols,-n] [--clip,-c] [--in-place,-i | --force,-f] pass-name [pass-length]
-	        Generate a new password of pass-length (or $GENERATED_LENGTH if unspecified) with optionally no symbols.
+	        overwriting existing quiz unless forced.
+	    $PROGRAM edit quiz-name
+	        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}.
+	    $PROGRAM generate [--no-symbols,-n] [--clip,-c] [--in-place,-i | --force,-f] quiz-name [quiz-length]
+	        Generate a new quiz of quiz-length (or $GENERATED_LENGTH if unspecified) with optionally no symbols.
 	        Optionally put it on the clipboard and clear board after $CLIP_TIME seconds.
-	        Prompt before overwriting existing password unless forced.
-	        Optionally replace only the first line of an existing file with a new password.
-	    $PROGRAM rm [--recursive,-r] [--force,-f] pass-name
-	        Remove existing password or directory, optionally forcefully.
+	        Prompt before overwriting existing quiz unless forced.
+	        Optionally replace only the first line of an existing file with a new quiz.
+	    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name
+	        Remove existing quiz or directory, optionally forcefully.
 	    $PROGRAM mv [--force,-f] old-path new-path
 	        Renames or moves old-path to new-path, optionally forcefully, selectively reencrypting.
 	    $PROGRAM cp [--force,-f] old-path new-path
@@ -314,7 +314,7 @@ cmd_usage() {
 	    $PROGRAM version
 	        Show version information.
 
-	More information may be found in the pass(1) man page.
+	More information may be found in the quiz(1) man page.
 	_EOF
 }
 
@@ -376,24 +376,24 @@ cmd_show() {
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [pass-name]"
+	[[ $err -ne 0 || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [quiz-name]"
 
-	local pass
+	local quiz
 	local path="$1"
-	local passfile="$PREFIX/$path.gpg"
+	local quizfile="$PREFIX/$path.gpg"
 	check_sneaky_paths "$path"
-	if [[ -f $passfile ]]; then
+	if [[ -f $quizfile ]]; then
 		if [[ $clip -eq 0 && $qrcode -eq 0 ]]; then
-			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | $BASE64)" || exit $?
-			echo "$pass" | $BASE64 -d
+			quiz="$($GPG -d "${GPG_OPTS[@]}" "$quizfile" | $BASE64)" || exit $?
+			echo "$quiz" | $BASE64 -d
 		else
 			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
-			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | tail -n +${selected_line} | head -n 1)" || exit $?
-			[[ -n $pass ]] || die "There is no password to put on the clipboard at line ${selected_line}."
+			quiz="$($GPG -d "${GPG_OPTS[@]}" "$quizfile" | tail -n +${selected_line} | head -n 1)" || exit $?
+			[[ -n $quiz ]] || die "There is no quiz to put on the clipboard at line ${selected_line}."
 			if [[ $clip -eq 1 ]]; then
-				clip "$pass" "$path"
+				clip "$quiz" "$path"
 			elif [[ $qrcode -eq 1 ]]; then
-				qrcode "$pass" "$path"
+				qrcode "$quiz" "$path"
 			fi
 		fi
 	elif [[ -d $PREFIX/$path ]]; then
@@ -404,14 +404,14 @@ cmd_show() {
 		fi
 		tree -N -C -l --noreport "$PREFIX/$path" 3>&- | tail -n +2 | sed -E 's/\.gpg(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .gpg at end of line, but keep colors
 	elif [[ -z $path ]]; then
-		die "Error: quiz store is empty. Try \"pass init\"."
+		die "Error: quiz store is empty. Try \"quiz init\"."
 	else
 		die "Error: $path is not in the quiz store."
 	fi
 }
 
 cmd_find() {
-	[[ $# -eq 0 ]] && die "Usage: $PROGRAM $COMMAND pass-names..."
+	[[ $# -eq 0 ]] && die "Usage: $PROGRAM $COMMAND quiz-names..."
 	IFS="," eval 'echo "Search Terms: $*"'
 	local terms="*$(printf '%s*|*' "$@")"
 	tree -N -C -l --noreport -P "${terms%|*}" --prune --matchdirs --ignore-case "$PREFIX" 3>&- | tail -n +2 | sed -E 's/\.gpg(\x1B\[[0-9]+m)?( ->|$)/\1\2/g'
@@ -419,16 +419,16 @@ cmd_find() {
 
 cmd_grep() {
 	[[ $# -lt 1 ]] && die "Usage: $PROGRAM $COMMAND [GREPOPTIONS] search-string"
-	local passfile grepresults
-	while read -r -d "" passfile; do
-		grepresults="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | grep --color=always "$@")"
+	local quizfile grepresults
+	while read -r -d "" quizfile; do
+		grepresults="$($GPG -d "${GPG_OPTS[@]}" "$quizfile" | grep --color=always "$@")"
 		[[ $? -ne 0 ]] && continue
-		passfile="${passfile%.gpg}"
-		passfile="${passfile#$PREFIX/}"
-		local passfile_dir="${passfile%/*}/"
-		[[ $passfile_dir == "${passfile}/" ]] && passfile_dir=""
-		passfile="${passfile##*/}"
-		printf "\e[94m%s\e[1m%s\e[0m:\n" "$passfile_dir" "$passfile"
+		quizfile="${quizfile%.gpg}"
+		quizfile="${quizfile#$PREFIX/}"
+		local quizfile_dir="${quizfile%/*}/"
+		[[ $quizfile_dir == "${quizfile}/" ]] && quizfile_dir=""
+		quizfile="${quizfile##*/}"
+		printf "\e[94m%s\e[1m%s\e[0m:\n" "$quizfile_dir" "$quizfile"
 		echo "$grepresults"
 	done < <(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.gpg' -print0)
 }
@@ -445,13 +445,13 @@ cmd_insert() {
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || ( $multiline -eq 1 && $noecho -eq 0 ) || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--echo,-e | --multiline,-m] [--force,-f] pass-name"
+	[[ $err -ne 0 || ( $multiline -eq 1 && $noecho -eq 0 ) || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--echo,-e | --multiline,-m] [--force,-f] quiz-name"
 	local path="${1%/}"
-	local passfile="$PREFIX/$path.gpg"
+	local quizfile="$PREFIX/$path.gpg"
 	check_sneaky_paths "$path"
-	set_git "$passfile"
+	set_git "$quizfile"
 
-	[[ $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $path. Overwrite it?"
+	[[ $force -eq 0 && -e $quizfile ]] && yesno "An entry already exists for $path. Overwrite it?"
 
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
 	set_gpg_recipients "$(dirname -- "$path")"
@@ -459,58 +459,58 @@ cmd_insert() {
 	if [[ $multiline -eq 1 ]]; then
 		echo "Enter contents of $path and press Ctrl+D when finished:"
 		echo
-		$GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+		$GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
 	elif [[ $noecho -eq 1 ]]; then
-		local password password_again
+		local quiz quiz_again
 		while true; do
-			read -r -p "Enter password for $path: " -s password || exit 1
+			read -r -p "Enter quiz for $path: " -s quiz || exit 1
 			echo
-			read -r -p "Retype password for $path: " -s password_again || exit 1
+			read -r -p "Retype quiz for $path: " -s quiz_again || exit 1
 			echo
-			if [[ $password == "$password_again" ]]; then
-				echo "$password" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+			if [[ $quiz == "$quiz_again" ]]; then
+				echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
 				break
 			else
-				die "Error: the entered passwords do not match."
+				die "Error: the entered quizzes do not match."
 			fi
 		done
 	else
-		local password
-		read -r -p "Enter password for $path: " -e password
-		echo "$password" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+		local quiz
+		read -r -p "Enter quiz for $path: " -e quiz
+		echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
 	fi
-	git_add_file "$passfile" "Add given password for $path to store."
+	git_add_file "$quizfile" "Add given quiz for $path to store."
 }
 
 cmd_edit() {
-	[[ $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND pass-name"
+	[[ $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND quiz-name"
 
 	local path="${1%/}"
 	check_sneaky_paths "$path"
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
 	set_gpg_recipients "$(dirname -- "$path")"
-	local passfile="$PREFIX/$path.gpg"
-	set_git "$passfile"
+	local quizfile="$PREFIX/$path.gpg"
+	set_git "$quizfile"
 
 	tmpdir #Defines $SECURE_TMPDIR
 	local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}.txt"
 
 	local action="Add"
-	if [[ -f $passfile ]]; then
-		$GPG -d -o "$tmp_file" "${GPG_OPTS[@]}" "$passfile" || exit 1
+	if [[ -f $quizfile ]]; then
+		$GPG -d -o "$tmp_file" "${GPG_OPTS[@]}" "$quizfile" || exit 1
 		action="Edit"
 	fi
 	${EDITOR:-vi} "$tmp_file"
-	[[ -f $tmp_file ]] || die "New password not saved."
-	$GPG -d -o - "${GPG_OPTS[@]}" "$passfile" 2>/dev/null | diff - "$tmp_file" &>/dev/null && die "Password unchanged."
-	while ! $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" "$tmp_file"; do
+	[[ -f $tmp_file ]] || die "New quiz not saved."
+	$GPG -d -o - "${GPG_OPTS[@]}" "$quizfile" 2>/dev/null | diff - "$tmp_file" &>/dev/null && die "Password unchanged."
+	while ! $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" "$tmp_file"; do
 		yesno "GPG encryption failed. Would you like to try again?"
 	done
-	git_add_file "$passfile" "$action password for $path using ${EDITOR:-vi}."
+	git_add_file "$quizfile" "$action quiz for $path using ${EDITOR:-vi}."
 }
 
 cmd_generate() {
-	local opts qrcode=0 clip=0 force=0 characters="$CHARACTER_SET" inplace=0 pass
+	local opts qrcode=0 clip=0 force=0 characters="$CHARACTER_SET" inplace=0 quiz
 	opts="$($GETOPT -o nqcif -l no-symbols,qrcode,clip,in-place,force -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
@@ -523,42 +523,42 @@ cmd_generate() {
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || ( $# -ne 2 && $# -ne 1 ) || ( $force -eq 1 && $inplace -eq 1 ) || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--no-symbols,-n] [--clip,-c] [--qrcode,-q] [--in-place,-i | --force,-f] pass-name [pass-length]"
+	[[ $err -ne 0 || ( $# -ne 2 && $# -ne 1 ) || ( $force -eq 1 && $inplace -eq 1 ) || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--no-symbols,-n] [--clip,-c] [--qrcode,-q] [--in-place,-i | --force,-f] quiz-name [quiz-length]"
 	local path="$1"
 	local length="${2:-$GENERATED_LENGTH}"
 	check_sneaky_paths "$path"
-	[[ $length =~ ^[0-9]+$ ]] || die "Error: pass-length \"$length\" must be a number."
-	[[ $length -gt 0 ]] || die "Error: pass-length must be greater than zero."
+	[[ $length =~ ^[0-9]+$ ]] || die "Error: quiz-length \"$length\" must be a number."
+	[[ $length -gt 0 ]] || die "Error: quiz-length must be greater than zero."
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
 	set_gpg_recipients "$(dirname -- "$path")"
-	local passfile="$PREFIX/$path.gpg"
-	set_git "$passfile"
+	local quizfile="$PREFIX/$path.gpg"
+	set_git "$quizfile"
 
-	[[ $inplace -eq 0 && $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $path. Overwrite it?"
+	[[ $inplace -eq 0 && $force -eq 0 && -e $quizfile ]] && yesno "An entry already exists for $path. Overwrite it?"
 
-	read -r -n $length pass < <(LC_ALL=C tr -dc "$characters" < /dev/urandom)
-	[[ ${#pass} -eq $length ]] || die "Could not generate password from /dev/urandom."
+	read -r -n $length quiz < <(LC_ALL=C tr -dc "$characters" < /dev/urandom)
+	[[ ${#quiz} -eq $length ]] || die "Could not generate quiz from /dev/urandom."
 	if [[ $inplace -eq 0 ]]; then
-		echo "$pass" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+		echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
 	else
-		local passfile_temp="${passfile}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
-		if { echo "$pass"; $GPG -d "${GPG_OPTS[@]}" "$passfile" | tail -n +2; } | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$passfile_temp" "${GPG_OPTS[@]}"; then
-			mv "$passfile_temp" "$passfile"
+		local quizfile_temp="${quizfile}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
+		if { echo "$quiz"; $GPG -d "${GPG_OPTS[@]}" "$quizfile" | tail -n +2; } | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile_temp" "${GPG_OPTS[@]}"; then
+			mv "$quizfile_temp" "$quizfile"
 		else
-			rm -f "$passfile_temp"
-			die "Could not reencrypt new password."
+			rm -f "$quizfile_temp"
+			die "Could not reencrypt new quiz."
 		fi
 	fi
 	local verb="Add"
 	[[ $inplace -eq 1 ]] && verb="Replace"
-	git_add_file "$passfile" "$verb generated password for ${path}."
+	git_add_file "$quizfile" "$verb generated quiz for ${path}."
 
 	if [[ $clip -eq 1 ]]; then
-		clip "$pass" "$path"
+		clip "$quiz" "$path"
 	elif [[ $qrcode -eq 1 ]]; then
-		qrcode "$pass" "$path"
+		qrcode "$quiz" "$path"
 	else
-		printf "\e[1mThe generated password for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$path" "$pass"
+		printf "\e[1mThe generated quiz for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$path" "$quiz"
 	fi
 }
 
@@ -572,26 +572,26 @@ cmd_delete() {
 		-f|--force) force=1; shift ;;
 		--) shift; break ;;
 	esac done
-	[[ $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--recursive,-r] [--force,-f] pass-name"
+	[[ $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--recursive,-r] [--force,-f] quiz-name"
 	local path="$1"
 	check_sneaky_paths "$path"
 
-	local passdir="$PREFIX/${path%/}"
-	local passfile="$PREFIX/$path.gpg"
-	[[ -f $passfile && -d $passdir && $path == */ || ! -f $passfile ]] && passfile="${passdir%/}/"
-	[[ -e $passfile ]] || die "Error: $path is not in the quiz store."
-	set_git "$passfile"
+	local quizdir="$PREFIX/${path%/}"
+	local quizfile="$PREFIX/$path.gpg"
+	[[ -f $quizfile && -d $quizdir && $path == */ || ! -f $quizfile ]] && quizfile="${quizdir%/}/"
+	[[ -e $quizfile ]] || die "Error: $path is not in the quiz store."
+	set_git "$quizfile"
 
 	[[ $force -eq 1 ]] || yesno "Are you sure you would like to delete $path?"
 
-	rm $recursive -f -v "$passfile"
-	set_git "$passfile"
-	if [[ -n $INNER_GIT_DIR && ! -e $passfile ]]; then
-		git -C "$INNER_GIT_DIR" rm -qr "$passfile"
-		set_git "$passfile"
+	rm $recursive -f -v "$quizfile"
+	set_git "$quizfile"
+	if [[ -n $INNER_GIT_DIR && ! -e $quizfile ]]; then
+		git -C "$INNER_GIT_DIR" rm -qr "$quizfile"
+		set_git "$quizfile"
 		git_commit "Remove $path from store."
 	fi
-	rmdir -p "${passfile%/*}" 2>/dev/null
+	rmdir -p "${quizfile%/*}" 2>/dev/null
 }
 
 cmd_copy_move() {

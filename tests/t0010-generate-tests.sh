@@ -11,9 +11,9 @@ test_expect_success 'Test "generate" command' '
 '
 
 test_expect_success 'Test replacement of first line' '
-	"$PASS" insert -m cred2 <<<"$(printf "this is a big\\npassword\\nwith\\nmany\\nlines\\nin it bla bla")" &&
+	"$PASS" insert -m cred2 <<<"$(printf "this is a big\\nquiz\\nwith\\nmany\\nlines\\nin it bla bla")" &&
 	"$PASS" generate -i cred2 23 &&
-	[[ $("$PASS" show cred2) == "$(printf "%s\\npassword\\nwith\\nmany\\nlines\\nin it bla bla" "$("$PASS" show cred2 | head -n 1)")" ]]
+	[[ $("$PASS" show cred2) == "$(printf "%s\\nquiz\\nwith\\nmany\\nlines\\nin it bla bla" "$("$PASS" show cred2 | head -n 1)")" ]]
 '
 
 test_done

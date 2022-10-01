@@ -20,7 +20,7 @@ test_expect_success 'Test "show" command with unicode' '
 	"$PASS" show | grep -q '🏠'
 '
 
-test_expect_success 'Test "show" of nonexistant password' '
+test_expect_success 'Test "show" of nonexistant quiz' '
 	test_must_fail "$PASS" show cred2
 '
 

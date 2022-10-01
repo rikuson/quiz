@@ -18,7 +18,7 @@ test_expect_success 'Test "rm" command with spaces' '
 	[[ ! -e $PASSWORD_STORE_DIR/"hello i have spaces".gpg ]]
 '
 
-test_expect_success 'Test "rm" of non-existent password' '
+test_expect_success 'Test "rm" of non-existent quiz' '
 	test_must_fail "$PASS" rm does-not-exist
 '
 

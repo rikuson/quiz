@@ -4,7 +4,7 @@ test_description='Reencryption consistency'
 cd "$(dirname "$0")"
 . ./setup.sh
 
-INITIAL_PASSWORD="will this password live? a big question indeed..."
+INITIAL_PASSWORD="will this quiz live? a big question indeed..."
 
 canonicalize_gpg_keys() {
 	$GPG --list-keys --with-colons "$@" | sed -n 's/sub:[^:]*:[^:]*:[^:]*:\([^:]*\):[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:[a-zA-Z]*e[a-zA-Z]*:.*/\1/p' | LC_ALL=C sort -u

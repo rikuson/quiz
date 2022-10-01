@@ -7,9 +7,9 @@ cd "$(dirname "$0")"
 test_expect_success 'Test "edit" command' '
 	"$PASS" init $KEY1 &&
 	"$PASS" generate cred1 90 &&
-	export FAKE_EDITOR_PASSWORD="big fat fake password" &&
+	export FAKE_EDITOR_PASSWORD="big fat fake quiz" &&
 	export PATH="$TEST_HOME:$PATH"
-	export EDITOR="fake-editor-change-password.sh" &&
+	export EDITOR="fake-editor-change-quiz.sh" &&
 	"$PASS" edit cred1 &&
 	[[ $("$PASS" show cred1) == "$FAKE_EDITOR_PASSWORD" ]]
 '
