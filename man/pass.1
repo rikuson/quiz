@@ -103,8 +103,6 @@ or
 .BR wl-clipboard(1)
 and then restore the clipboard after 45 (or \fIQUIZ_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
 or \fI-q\fP is specified, do not print the quiz but instead display a QR code using
-.BR qrencode (1)
-either to the terminal or graphically if supported.
 .TP
 \fBinsert\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIquiz-name\fP
 Insert a new quiz into the quiz store called \fIquiz-name\fP. This will
@@ -138,11 +136,6 @@ or
 .BR wl-clipboard(1)
 and then restore the clipboard after 45 (or \fIQUIZ_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
 or \fI-q\fP is specified, do not print the quiz but instead display a QR code using
-.BR qrencode (1)
-either to the terminal or graphically if supported. Prompt before overwriting an existing quiz,
-unless \fI--force\fP or \fI-f\fP is specified. If \fI--in-place\fP or \fI-i\fP is
-specified, do not interactively prompt, and only replace the first line of the quiz
-file with the new generated quiz, keeping the remainder of the file intact.
 .TP
 \fBrm\fP [ \fI--recursive\fP, \fI-r\fP ] [ \fI--force\fP, \fI-f\fP ] \fIquiz-name\fP
 Remove the quiz named \fIquiz-name\fP from the quiz store. This command is
@@ -471,7 +464,6 @@ The location of the text editor used by \fBedit\fP.
 .BR git (1),
 .BR xclip (1),
 .BR wl-clipboard (1),
-.BR qrencode (1).
 
 .SH AUTHOR
 .B quiz
