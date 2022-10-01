@@ -7,7 +7,7 @@ function __fish_pass_get_prefix
     if set -q PASSWORD_STORE_DIR
         realpath -- "$PASSWORD_STORE_DIR"
     else
-        echo "$HOME/.password-store"
+        echo "$HOME/.quiz-store"
     end
 end
 
@@ -61,7 +61,7 @@ complete -c $PROG -f -n '__fish_pass_needs_command' -a help -d 'Command: show us
 complete -c $PROG -f -n '__fish_pass_needs_command' -a version -d 'Command: show program version'
 
 complete -c $PROG -f -n '__fish_pass_needs_command' -a init -d 'Command: initialize new password storage'
-complete -c $PROG -f -n '__fish_pass_uses_command init' -s p -l path -d 'Assign gpg-id for specified sub folder of password store'
+complete -c $PROG -f -n '__fish_pass_uses_command init' -s p -l path -d 'Assign gpg-id for specified sub folder of quiz store'
 
 complete -c $PROG -f -n '__fish_pass_needs_command' -a ls -d 'Command: list passwords'
 complete -c $PROG -f -n '__fish_pass_uses_command ls' -a "(__fish_pass_print_entry_dirs)"

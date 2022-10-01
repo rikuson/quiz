@@ -1,7 +1,7 @@
 # This file should be sourced by all test-scripts
 #
 # This scripts sets the following:
-#   $PASS	Full path to password-store script to test
+#   $PASS	Full path to quiz-store script to test
 #   $GPG	Name of gpg executable
 #   $KEY{1..5}	GPG key ids of testing keys
 #   $TEST_HOME	This folder
@@ -42,9 +42,9 @@ git config --global user.email "Pass-Automated-Testing-Suite@zx2c4.com"
 git config --global user.name "Pass Automated Testing Suite"
 
 
-PASS="$TEST_HOME/../src/password-store.sh"
+PASS="$TEST_HOME/../src/quiz-store.sh"
 if [[ ! -e $PASS ]]; then
-	echo "Could not find password-store.sh"
+	echo "Could not find quiz-store.sh"
 	exit 1
 fi
 

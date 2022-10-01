@@ -12,7 +12,7 @@ export GPG_TTY="${GPG_TTY:-$(tty 2>/dev/null)}"
 command -v gpg2 &>/dev/null && GPG="gpg2"
 [[ -n $GPG_AGENT_INFO || $GPG == "gpg2" ]] && GPG_OPTS+=( "--batch" "--use-agent" )
 
-PREFIX="${PASSWORD_STORE_DIR:-$HOME/.password-store}"
+PREFIX="${PASSWORD_STORE_DIR:-$HOME/.quiz-store}"
 EXTENSIONS="${PASSWORD_STORE_EXTENSIONS_DIR:-$PREFIX/.extensions}"
 X_SELECTION="${PASSWORD_STORE_X_SELECTION:-clipboard}"
 CLIP_TIME="${PASSWORD_STORE_CLIP_TIME:-45}"
@@ -90,7 +90,7 @@ set_gpg_recipients() {
 		cat >&2 <<-_EOF
 		Error: You must run:
 		    $PROGRAM init your-gpg-id
-		before you may use the password store.
+		before you may use the quiz store.
 
 		_EOF
 		cmd_usage
@@ -170,7 +170,7 @@ clip() {
 	else
 		die "Error: No X11 or Wayland display and clipper detected"
 	fi
-	local sleep_argv0="password store sleep on display $display_name"
+	local sleep_argv0="quiz store sleep on display $display_name"
 
 	# This base64 business is because bash cannot store binary data in a shell
 	# variable. Specifically, it cannot store nulls nor (non-trivally) store
@@ -267,7 +267,7 @@ cmd_version() {
 	=             Jason A. Donenfeld           =
 	=               Jason@zx2c4.com            =
 	=                                          =
-	=      http://www.passwordstore.org/       =
+	=      https://github.com/rikuson/quiz     =
 	============================================
 	_EOF
 }
@@ -307,7 +307,7 @@ cmd_usage() {
 	    $PROGRAM cp [--force,-f] old-path new-path
 	        Copies old-path to new-path, optionally forcefully, selectively reencrypting.
 	    $PROGRAM git git-command-args...
-	        If the password store is a git repository, execute a git command
+	        If the quiz store is a git repository, execute a git command
 	        specified by git-command-args.
 	    $PROGRAM help
 	        Show this text.
@@ -347,7 +347,7 @@ cmd_init() {
 		mkdir -v -p "$PREFIX/$id_path"
 		printf "%s\n" "$@" > "$gpg_id"
 		local id_print="$(printf "%s, " "$@")"
-		echo "Password store initialized for ${id_print%, }${id_path:+ ($id_path)}"
+		echo "Quiz store initialized for ${id_print%, }${id_path:+ ($id_path)}"
 		git_add_file "$gpg_id" "Set GPG id to ${id_print%, }${id_path:+ ($id_path)}."
 		if [[ -n $PASSWORD_STORE_SIGNING_KEY ]]; then
 			local signing_keys=( ) key
@@ -362,7 +362,7 @@ cmd_init() {
 	fi
 
 	reencrypt_path "$PREFIX/$id_path"
-	git_add_file "$PREFIX/$id_path" "Reencrypt password store using new GPG id ${id_print%, }${id_path:+ ($id_path)}."
+	git_add_file "$PREFIX/$id_path" "Reencrypt quiz store using new GPG id ${id_print%, }${id_path:+ ($id_path)}."
 }
 
 cmd_show() {
@@ -398,15 +398,15 @@ cmd_show() {
 		fi
 	elif [[ -d $PREFIX/$path ]]; then
 		if [[ -z $path ]]; then
-			echo "Password Store"
+			echo "Quiz Store"
 		else
 			echo "${path%\/}"
 		fi
 		tree -N -C -l --noreport "$PREFIX/$path" 3>&- | tail -n +2 | sed -E 's/\.gpg(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .gpg at end of line, but keep colors
 	elif [[ -z $path ]]; then
-		die "Error: password store is empty. Try \"pass init\"."
+		die "Error: quiz store is empty. Try \"pass init\"."
 	else
-		die "Error: $path is not in the password store."
+		die "Error: $path is not in the quiz store."
 	fi
 }
 
@@ -579,7 +579,7 @@ cmd_delete() {
 	local passdir="$PREFIX/${path%/}"
 	local passfile="$PREFIX/$path.gpg"
 	[[ -f $passfile && -d $passdir && $path == */ || ! -f $passfile ]] && passfile="${passdir%/}/"
-	[[ -e $passfile ]] || die "Error: $path is not in the password store."
+	[[ -e $passfile ]] || die "Error: $path is not in the quiz store."
 	set_git "$passfile"
 
 	[[ $force -eq 1 ]] || yesno "Are you sure you would like to delete $path?"
@@ -616,7 +616,7 @@ cmd_copy_move() {
 		old_path="${old_path}.gpg"
 	fi
 	echo "$old_path"
-	[[ -e $old_path ]] || die "Error: $1 is not in the password store."
+	[[ -e $old_path ]] || die "Error: $1 is not in the quiz store."
 
 	mkdir -p -v "${new_path%/*}"
 	[[ -d $old_path || -d $new_path || $new_path == */ ]] || new_path="${new_path}.gpg"
@@ -654,7 +654,7 @@ cmd_git() {
 	if [[ $1 == "init" ]]; then
 		INNER_GIT_DIR="$PREFIX"
 		git -C "$INNER_GIT_DIR" "$@" || exit 1
-		git_add_file "$PREFIX" "Add current contents of password store."
+		git_add_file "$PREFIX" "Add current contents of quiz store."
 
 		echo '*.gpg diff=gpg' > "$PREFIX/.gitattributes"
 		git_add_file .gitattributes "Configure git repository for gpg file diff."
@@ -665,7 +665,7 @@ cmd_git() {
 		export TMPDIR="$SECURE_TMPDIR"
 		git -C "$INNER_GIT_DIR" "$@"
 	else
-		die "Error: the password store is not a git repository. Try \"$PROGRAM git init\"."
+		die "Error: the quiz store is not a git repository. Try \"$PROGRAM git init\"."
 	fi
 }
 

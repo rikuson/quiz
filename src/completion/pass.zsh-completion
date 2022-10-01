@@ -102,7 +102,7 @@ _pass () {
 			"mv:Rename the password"
 			"cp:Copy the password"
 			"rm:Remove the password"
-			"git:Call git on the password store"
+			"git:Call git on the quiz store"
 			"version:Output version information"
 			"help:Output help message"
 		)
@@ -123,7 +123,7 @@ _pass_cmd_show () {
 _pass_complete_entries_helper () {
 	local IFS=$'\n'
 	local prefix
-	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${PASSWORD_STORE_DIR:-$HOME/.password-store}"
+	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store}"
 	_values -C 'passwords' ${$(find -L "$prefix" \( -name .git -o -name .gpg-id \) -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.gpg##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
 }
 
