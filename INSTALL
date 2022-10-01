@@ -2,7 +2,7 @@ Simply typing
 
     make install
 
-should install pass to the standard locations.
+should install quiz to the standard locations.
 
 The makefile is aware of the following environment variables:
 

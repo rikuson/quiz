@@ -4,8 +4,8 @@
 # Brian Mattern <rephorm@rephorm.com>. All Rights Reserved.
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
-_pass_complete_entries () {
-	local prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store/}"
+_quiz_complete_entries () {
+	local prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
 	local suffix=".gpg"
 	local autoexpand=${1:-0}
@@ -58,8 +58,8 @@ _pass_complete_entries () {
 	fi
 }
 
-_pass_complete_folders () {
-	local prefix="${PASSWORD_STORE_DIR:-$HOME/.quiz-store/}"
+_quiz_complete_folders () {
+	local prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
 
 	local IFS=$'\n'
@@ -70,7 +70,7 @@ _pass_complete_folders () {
 	done
 }
 
-_pass_complete_keys () {
+_quiz_complete_keys () {
 	local GPG="gpg"
 	command -v gpg2 &>/dev/null && GPG="gpg2"
 
@@ -80,45 +80,45 @@ _pass_complete_keys () {
 	COMPREPLY+=($(compgen -W "${keys}" -- ${cur}))
 }
 
-_pass()
+_quiz()
 {
 	COMPREPLY=()
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local commands="init ls find grep show insert generate edit rm mv cp git help version ${PASSWORD_STORE_EXTENSION_COMMANDS[*]}"
+	local commands="init ls find grep show insert generate edit rm mv cp git help version ${QUIZ_STORE_EXTENSION_COMMANDS[*]}"
 	if [[ $COMP_CWORD -gt 1 ]]; then
 		local lastarg="${COMP_WORDS[$COMP_CWORD-1]}"
 		case "${COMP_WORDS[1]}" in
 			init)
 				if [[ $lastarg == "-p" || $lastarg == "--path" ]]; then
-					_pass_complete_folders
+					_quiz_complete_folders
 					compopt -o nospace
 				else
 					COMPREPLY+=($(compgen -W "-p --path" -- ${cur}))
-					_pass_complete_keys
+					_quiz_complete_keys
 				fi
 				;;
 			ls|list|edit)
-				_pass_complete_entries
+				_quiz_complete_entries
 				;;
 			show|-*)
 				COMPREPLY+=($(compgen -W "-c --clip" -- ${cur}))
-				_pass_complete_entries 1
+				_quiz_complete_entries 1
 				;;
 			insert)
 				COMPREPLY+=($(compgen -W "-e --echo -m --multiline -f --force" -- ${cur}))
-				_pass_complete_entries
+				_quiz_complete_entries
 				;;
 			generate)
 				COMPREPLY+=($(compgen -W "-n --no-symbols -c --clip -f --force -i --in-place" -- ${cur}))
-				_pass_complete_entries
+				_quiz_complete_entries
 				;;
 			cp|copy|mv|rename)
 				COMPREPLY+=($(compgen -W "-f --force" -- ${cur}))
-				_pass_complete_entries
+				_quiz_complete_entries
 				;;
 			rm|remove|delete)
 				COMPREPLY+=($(compgen -W "-r --recursive -f --force" -- ${cur}))
-				_pass_complete_entries
+				_quiz_complete_entries
 				;;
 			git)
 				COMPREPLY+=($(compgen -W "init push pull config log reflog rebase" -- ${cur}))
@@ -128,17 +128,17 @@ _pass()
 		# To add completion for an extension command define a function like this:
 		# __quiz_store_extension_complete_<COMMAND>() {
 		#     COMPREPLY+=($(compgen -W "-o --option" -- ${cur}))
-		#     _pass_complete_entries 1
+		#     _quiz_complete_entries 1
 		# }
 		#
-		# and add the command to the $PASSWORD_STORE_EXTENSION_COMMANDS array
-		if [[ " ${PASSWORD_STORE_EXTENSION_COMMANDS[*]} " == *" ${COMP_WORDS[1]} "* ]] && type "__quiz_store_extension_complete_${COMP_WORDS[1]}" &> /dev/null; then
+		# and add the command to the $QUIZ_STORE_EXTENSION_COMMANDS array
+		if [[ " ${QUIZ_STORE_EXTENSION_COMMANDS[*]} " == *" ${COMP_WORDS[1]} "* ]] && type "__quiz_store_extension_complete_${COMP_WORDS[1]}" &> /dev/null; then
 			"__quiz_store_extension_complete_${COMP_WORDS[1]}"
 		fi
 	else
 		COMPREPLY+=($(compgen -W "${commands}" -- ${cur}))
-		_pass_complete_entries 1
+		_quiz_complete_entries 1
 	fi
 }
 
-complete -o filenames -F _pass pass
+complete -o filenames -F _quiz quiz
