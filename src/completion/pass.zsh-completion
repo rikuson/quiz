@@ -50,8 +50,6 @@ _quiz () {
 				_arguments : \
 					"-n[don't include symbols in quiz]" \
 					"--no-symbols[don't include symbols in quiz]" \
-					"-c[copy quiz to the clipboard]" \
-					"--clip[copy quiz to the clipboard]" \
 					"-f[force overwrite]" \
 					"--force[force overwrite]" \
 					"-i[replace first line]" \
@@ -115,9 +113,6 @@ _quiz () {
 }
 
 _quiz_cmd_show () {
-	_arguments : \
-		"-c[put it on the clipboard]" \
-		"--clip[put it on the clipboard]"
 	_quiz_complete_entries
 }
 _quiz_complete_entries_helper () {

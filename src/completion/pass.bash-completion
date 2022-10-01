@@ -101,15 +101,14 @@ _quiz()
 				_quiz_complete_entries
 				;;
 			show|-*)
-				COMPREPLY+=($(compgen -W "-c --clip" -- ${cur}))
-				_quiz_complete_entries 1
+				_quiz_complete_entries
 				;;
 			insert)
 				COMPREPLY+=($(compgen -W "-e --echo -m --multiline -f --force" -- ${cur}))
 				_quiz_complete_entries
 				;;
 			generate)
-				COMPREPLY+=($(compgen -W "-n --no-symbols -c --clip -f --force -i --in-place" -- ${cur}))
+				COMPREPLY+=($(compgen -W "-n --no-symbols -f --force -i --in-place" -- ${cur}))
 				_quiz_complete_entries
 				;;
 			cp|copy|mv|rename)
