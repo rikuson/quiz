@@ -1,20 +1,6 @@
 # Copyright (C) 2012 - 2014 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
-clip() {
-	local sleep_argv0="quiz store sleep for user $(id -u)"
-	pkill -f "^$sleep_argv0" 2>/dev/null && sleep 0.5
-	local before="$(pbpaste | $BASE64)"
-	echo -n "$1" | pbcopy
-	(
-		( exec -a "$sleep_argv0" sleep "$CLIP_TIME" )
-		local now="$(pbpaste | $BASE64)"
-		[[ $now != $(echo -n "$1" | $BASE64) ]] && before="$now"
-		echo "$before" | $BASE64 -d | pbcopy
-	) >/dev/null 2>&1 & disown
-	echo "Copied $2 to clipboard. Will clear in $CLIP_TIME seconds."
-}
-
 tmpdir() {
 	[[ -n $SECURE_TMPDIR ]] && return
 	unmount_tmpdir() {

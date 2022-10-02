@@ -74,7 +74,6 @@ complete -c $PROG -f -n '__fish_quiz_uses_command insert' -a "(__fish_quiz_print
 
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a generate -d 'Command: generate new quiz'
 complete -c $PROG -f -n '__fish_quiz_uses_command generate' -s n -l no-symbols -d 'Do not use special symbols'
-complete -c $PROG -f -n '__fish_quiz_uses_command generate' -s c -l clip -d 'Put the quiz in clipboard'
 complete -c $PROG -f -n '__fish_quiz_uses_command generate' -s f -l force -d 'Do not prompt before overwritting'
 complete -c $PROG -f -n '__fish_quiz_uses_command generate' -s i -l in-place -d 'Replace only the first line with the generated quiz'
 complete -c $PROG -f -n '__fish_quiz_uses_command generate' -a "(__fish_quiz_print_entry_dirs)"
@@ -96,13 +95,9 @@ complete -c $PROG -f -n '__fish_quiz_needs_command' -a edit -d 'Command: edit qu
 complete -c $PROG -f -n '__fish_quiz_uses_command edit' -a "(__fish_quiz_print_entries)"
 
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a show -d 'Command: show existing quiz'
-complete -c $PROG -f -n '__fish_quiz_uses_command show' -s c -l clip -d 'Put quiz in clipboard'
 complete -c $PROG -f -n '__fish_quiz_uses_command show' -a "(__fish_quiz_print_entries)"
 # When no command is given, `show` is defaulted.
-complete -c $PROG -f -n '__fish_quiz_needs_command' -s c -l clip -d 'Put quiz in clipboard'
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a "(__fish_quiz_print_entries)"
-complete -c $PROG -f -n '__fish_quiz_uses_command -c' -a "(__fish_quiz_print_entries)"
-complete -c $PROG -f -n '__fish_quiz_uses_command --clip' -a "(__fish_quiz_print_entries)"
 
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a git -d 'Command: execute a git command'
 complete -c $PROG -f -n '__fish_quiz_uses_command git' -a '(__fish_quiz_git_complete)'

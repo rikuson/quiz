@@ -14,8 +14,6 @@ command -v gpg2 &>/dev/null && GPG="gpg2"
 
 PREFIX="${QUIZ_STORE_DIR:-$HOME/.quiz-store}"
 EXTENSIONS="${QUIZ_STORE_EXTENSIONS_DIR:-$PREFIX/.extensions}"
-X_SELECTION="${QUIZ_STORE_X_SELECTION:-clipboard}"
-CLIP_TIME="${QUIZ_STORE_CLIP_TIME:-45}"
 GENERATED_LENGTH="${QUIZ_STORE_GENERATED_LENGTH:-25}"
 CHARACTER_SET="${QUIZ_STORE_CHARACTER_SET:-[:punct:][:alnum:]}"
 CHARACTER_SET_NO_SYMBOLS="${QUIZ_STORE_CHARACTER_SET_NO_SYMBOLS:-[:alnum:]}"
@@ -154,49 +152,6 @@ check_sneaky_paths() {
 # BEGIN platform definable
 #
 
-clip() {
-	if [[ -n $WAYLAND_DISPLAY ]] && command -v wl-copy &> /dev/null; then
-		local copy_cmd=( wl-copy )
-		local paste_cmd=( wl-paste -n )
-		if [[ $X_SELECTION == primary ]]; then
-			copy_cmd+=( --primary )
-			paste_cmd+=( --primary )
-		fi
-		local display_name="$WAYLAND_DISPLAY"
-	elif [[ -n $DISPLAY ]] && command -v xclip &> /dev/null; then
-		local copy_cmd=( xclip -selection "$X_SELECTION" )
-		local paste_cmd=( xclip -o -selection "$X_SELECTION" )
-		local display_name="$DISPLAY"
-	else
-		die "Error: No X11 or Wayland display and clipper detected"
-	fi
-	local sleep_argv0="quiz store sleep on display $display_name"
-
-	# This base64 business is because bash cannot store binary data in a shell
-	# variable. Specifically, it cannot store nulls nor (non-trivally) store
-	# trailing new lines.
-	pkill -f "^$sleep_argv0" 2>/dev/null && sleep 0.5
-	local before="$("${paste_cmd[@]}" 2>/dev/null | $BASE64)"
-	echo -n "$1" | "${copy_cmd[@]}" || die "Error: Could not copy data to the clipboard"
-	(
-		( exec -a "$sleep_argv0" bash <<<"trap 'kill %1' TERM; sleep '$CLIP_TIME' & wait" )
-		local now="$("${paste_cmd[@]}" | $BASE64)"
-		[[ $now != $(echo -n "$1" | $BASE64) ]] && before="$now"
-
-		# It might be nice to programatically check to see if klipper exists,
-		# as well as checking for other common clipboard managers. But for now,
-		# this works fine -- if qdbus isn't there or if klipper isn't running,
-		# this essentially becomes a no-op.
-		#
-		# Clipboard managers frequently write their history out in plaintext,
-		# so we axe it here:
-		qdbus org.kde.klipper /klipper org.kde.klipper.klipper.clearClipboardHistory &>/dev/null
-
-		echo "$before" | $BASE64 -d | "${copy_cmd[@]}"
-	) >/dev/null 2>&1 & disown
-	echo "Copied $2 to clipboard. Will clear in $CLIP_TIME seconds."
-}
-
 tmpdir() {
 	[[ -n $SECURE_TMPDIR ]] && return
 	local warn=1
@@ -268,9 +223,8 @@ cmd_usage() {
 	        List quizzes.
 	    $PROGRAM find quiz-names...
 	    	List quizzes that match quiz-names.
-	    $PROGRAM [show] [--clip[=line-number],-c[line-number]] quiz-name
-	        Show existing quiz and optionally put it on the clipboard.
-	        If put on the clipboard, it will be cleared in $CLIP_TIME seconds.
+	    $PROGRAM [show] quiz-name
+	        Show existing quiz.
 	    $PROGRAM grep [GREPOPTIONS] search-string
 	        Search for quiz files containing search-string when decrypted.
 	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] quiz-name
@@ -279,9 +233,8 @@ cmd_usage() {
 	        overwriting existing quiz unless forced.
 	    $PROGRAM edit quiz-name
 	        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}.
-	    $PROGRAM generate [--no-symbols,-n] [--clip,-c] [--in-place,-i | --force,-f] quiz-name [quiz-length]
+	    $PROGRAM generate [--no-symbols,-n] [--in-place,-i | --force,-f] quiz-name [quiz-length]
 	        Generate a new quiz of quiz-length (or $GENERATED_LENGTH if unspecified) with optionally no symbols.
-	        Optionally put it on the clipboard and clear board after $CLIP_TIME seconds.
 	        Prompt before overwriting existing quiz unless forced.
 	        Optionally replace only the first line of an existing file with a new quiz.
 	    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name
@@ -350,33 +303,15 @@ cmd_init() {
 }
 
 cmd_show() {
-	local opts selected_line clip=0
-	opts="$($GETOPT -o c:: -l clip:: -n "$PROGRAM" -- "$@")"
-	local err=$?
-	eval set -- "$opts"
-	while true; do case $1 in
-		-c|--clip) clip=1; selected_line="${2:-1}"; shift 2 ;;
-		--) shift; break ;;
-	esac done
-
-	[[ $err -ne 0 || ( $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [quiz-name]"
+	[[ $# -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [quiz-name]"
 
 	local quiz
 	local path="$1"
 	local quizfile="$PREFIX/$path.gpg"
 	check_sneaky_paths "$path"
 	if [[ -f $quizfile ]]; then
-		if [[ $clip -eq 0 ]]; then
-			quiz="$($GPG -d "${GPG_OPTS[@]}" "$quizfile" | $BASE64)" || exit $?
-			echo "$quiz" | $BASE64 -d
-		else
-			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
-			quiz="$($GPG -d "${GPG_OPTS[@]}" "$quizfile" | tail -n +${selected_line} | head -n 1)" || exit $?
-			[[ -n $quiz ]] || die "There is no quiz to put on the clipboard at line ${selected_line}."
-			if [[ $clip -eq 1 ]]; then
-				clip "$quiz" "$path"
-			fi
-		fi
+    quiz="$($GPG -d "${GPG_OPTS[@]}" "$quizfile" | $BASE64)" || exit $?
+    echo "$quiz" | $BASE64 -d
 	elif [[ -d $PREFIX/$path ]]; then
 		if [[ -z $path ]]; then
 			echo "Quiz Store"
@@ -491,19 +426,18 @@ cmd_edit() {
 }
 
 cmd_generate() {
-	local opts clip=0 force=0 characters="$CHARACTER_SET" inplace=0 quiz
-	opts="$($GETOPT -o nqcif -l no-symbols,clip,in-place,force -n "$PROGRAM" -- "$@")"
+	local opts force=0 characters="$CHARACTER_SET" inplace=0 quiz
+	opts="$($GETOPT -o nqcif -l no-symbols,in-place,force -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
 	while true; do case $1 in
 		-n|--no-symbols) characters="$CHARACTER_SET_NO_SYMBOLS"; shift ;;
-		-c|--clip) clip=1; shift ;;
 		-f|--force) force=1; shift ;;
 		-i|--in-place) inplace=1; shift ;;
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || ( $# -ne 2 && $# -ne 1 ) || ( $force -eq 1 && $inplace -eq 1 ) || ( $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--no-symbols,-n] [--clip,-c] [--in-place,-i | --force,-f] quiz-name [quiz-length]"
+	[[ $err -ne 0 || ( $# -ne 2 && $# -ne 1 ) || ( $force -eq 1 && $inplace -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--no-symbols,-n] [--in-place,-i | --force,-f] quiz-name [quiz-length]"
 	local path="$1"
 	local length="${2:-$GENERATED_LENGTH}"
 	check_sneaky_paths "$path"
@@ -533,11 +467,7 @@ cmd_generate() {
 	[[ $inplace -eq 1 ]] && verb="Replace"
 	git_add_file "$quizfile" "$verb generated quiz for ${path}."
 
-	if [[ $clip -eq 1 ]]; then
-		clip "$quiz" "$path"
-	else
-		printf "\e[1mThe generated quiz for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$path" "$quiz"
-	fi
+  printf "\e[1mThe generated quiz for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$path" "$quiz"
 }
 
 cmd_delete() {
