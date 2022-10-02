@@ -4,9 +4,8 @@ by Jason Donenfeld
    Jason@zx2c4.com
 ======================
 
-This is a very simple quiz store that encrypts quizzes using gpg and
-places the encrypted quiz in a directory. It can generate new quizzes
-and keep track of old ones.
+This is a very simple quiz store places the quiz in a directory.
+It can add new quizzes and keep track of old ones.
 
 Visit the project page for more information: https://github.com/rikuson/quiz/
 

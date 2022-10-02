@@ -84,7 +84,7 @@ _quiz()
 {
 	COMPREPLY=()
 	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local commands="init ls find grep show insert generate edit rm mv cp git help version ${QUIZ_STORE_EXTENSION_COMMANDS[*]}"
+	local commands="init ls find grep show insert edit rm mv cp git help version ${QUIZ_STORE_EXTENSION_COMMANDS[*]}"
 	if [[ $COMP_CWORD -gt 1 ]]; then
 		local lastarg="${COMP_WORDS[$COMP_CWORD-1]}"
 		case "${COMP_WORDS[1]}" in
@@ -105,10 +105,6 @@ _quiz()
 				;;
 			insert)
 				COMPREPLY+=($(compgen -W "-e --echo -m --multiline -f --force" -- ${cur}))
-				_quiz_complete_entries
-				;;
-			generate)
-				COMPREPLY+=($(compgen -W "-n --no-symbols -f --force -i --in-place" -- ${cur}))
 				_quiz_complete_entries
 				;;
 			cp|copy|mv|rename)
