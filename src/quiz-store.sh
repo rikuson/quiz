@@ -567,7 +567,6 @@ case "$1" in
 	grep) shift;			cmd_grep "$@" ;;
 	insert|add) shift;		cmd_insert "$@" ;;
 	edit) shift;			cmd_edit "$@" ;;
-	add) shift;		cmd_add "$@" ;;
 	delete|rm|remove) shift;	cmd_delete "$@" ;;
 	rename|mv) shift;		cmd_copy_move "move" "$@" ;;
 	copy|cp) shift;			cmd_copy_move "copy" "$@" ;;
