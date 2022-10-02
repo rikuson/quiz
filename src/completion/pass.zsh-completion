@@ -46,16 +46,6 @@ _quiz () {
 					"--multiline[multiline]"
 				_quiz_complete_entries_with_subdirs
 				;;
-			generate)
-				_arguments : \
-					"-n[don't include symbols in quiz]" \
-					"--no-symbols[don't include symbols in quiz]" \
-					"-f[force overwrite]" \
-					"--force[force overwrite]" \
-					"-i[replace first line]" \
-					"--in-place[replace first line]"
-				_quiz_complete_entries_with_subdirs
-				;;
 			cp|copy|mv|rename)
 				_arguments : \
 					"-f[force rename]" \
@@ -95,7 +85,6 @@ _quiz () {
 			"grep:Search inside decrypted quiz files for matching pattern"
 			"show:Decrypt and print a quiz"
 			"insert:Insert a new quiz"
-			"generate:Generate a new quiz using pwgen"
 			"edit:Edit a quiz with \$EDITOR"
 			"mv:Rename the quiz"
 			"cp:Copy the quiz"

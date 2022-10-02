@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Test "show" command' '
 	"$QUIZ" init $KEY1 &&
-	"$QUIZ" generate cred1 20 &&
+	"$QUIZ" insert cred1 -e <<<"$(fake-answer.sh 20)" &&
 	"$QUIZ" show cred1
 '
 
@@ -16,7 +16,7 @@ test_expect_success 'Test "show" command with spaces' '
 '
 
 test_expect_success 'Test "show" command with unicode' '
-	"$QUIZ" generate 🏠 &&
+	"$QUIZ" insert 🏠 -e <<<"$(printf "fakeanswer")" &&
 	"$QUIZ" show | grep -q '🏠'
 '
 

@@ -14,9 +14,6 @@ command -v gpg2 &>/dev/null && GPG="gpg2"
 
 PREFIX="${QUIZ_STORE_DIR:-$HOME/.quiz-store}"
 EXTENSIONS="${QUIZ_STORE_EXTENSIONS_DIR:-$PREFIX/.extensions}"
-GENERATED_LENGTH="${QUIZ_STORE_GENERATED_LENGTH:-25}"
-CHARACTER_SET="${QUIZ_STORE_CHARACTER_SET:-[:punct:][:alnum:]}"
-CHARACTER_SET_NO_SYMBOLS="${QUIZ_STORE_CHARACTER_SET_NO_SYMBOLS:-[:alnum:]}"
 
 unset GIT_DIR GIT_WORK_TREE GIT_NAMESPACE GIT_INDEX_FILE GIT_INDEX_VERSION GIT_OBJECT_DIRECTORY GIT_COMMON_DIR
 export GIT_CEILING_DIRECTORIES="$PREFIX/.."
@@ -233,10 +230,6 @@ cmd_usage() {
 	        overwriting existing quiz unless forced.
 	    $PROGRAM edit quiz-name
 	        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}.
-	    $PROGRAM generate [--no-symbols,-n] [--in-place,-i | --force,-f] quiz-name [quiz-length]
-	        Generate a new quiz of quiz-length (or $GENERATED_LENGTH if unspecified) with optionally no symbols.
-	        Prompt before overwriting existing quiz unless forced.
-	        Optionally replace only the first line of an existing file with a new quiz.
 	    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name
 	        Remove existing quiz or directory, optionally forcefully.
 	    $PROGRAM mv [--force,-f] old-path new-path
@@ -379,9 +372,9 @@ cmd_insert() {
 	elif [[ $noecho -eq 1 ]]; then
 		local quiz quiz_again
 		while true; do
-			read -r -p "Enter quiz for $path: " -s quiz || exit 1
+			read -r -p "Enter answer for $path: " -s quiz || exit 1
 			echo
-			read -r -p "Retype quiz for $path: " -s quiz_again || exit 1
+			read -r -p "Retype answer for $path: " -s quiz_again || exit 1
 			echo
 			if [[ $quiz == "$quiz_again" ]]; then
 				echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
@@ -392,10 +385,10 @@ cmd_insert() {
 		done
 	else
 		local quiz
-		read -r -p "Enter quiz for $path: " -e quiz
+		read -r -p "Enter answer for $path: " -e quiz
 		echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
 	fi
-	git_add_file "$quizfile" "Add given quiz for $path to store."
+	git_add_file "$quizfile" "Add given answer for $path to store."
 }
 
 cmd_edit() {
@@ -423,51 +416,6 @@ cmd_edit() {
 		yesno "GPG encryption failed. Would you like to try again?"
 	done
 	git_add_file "$quizfile" "$action quiz for $path using ${EDITOR:-vi}."
-}
-
-cmd_generate() {
-	local opts force=0 characters="$CHARACTER_SET" inplace=0 quiz
-	opts="$($GETOPT -o nqcif -l no-symbols,in-place,force -n "$PROGRAM" -- "$@")"
-	local err=$?
-	eval set -- "$opts"
-	while true; do case $1 in
-		-n|--no-symbols) characters="$CHARACTER_SET_NO_SYMBOLS"; shift ;;
-		-f|--force) force=1; shift ;;
-		-i|--in-place) inplace=1; shift ;;
-		--) shift; break ;;
-	esac done
-
-	[[ $err -ne 0 || ( $# -ne 2 && $# -ne 1 ) || ( $force -eq 1 && $inplace -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--no-symbols,-n] [--in-place,-i | --force,-f] quiz-name [quiz-length]"
-	local path="$1"
-	local length="${2:-$GENERATED_LENGTH}"
-	check_sneaky_paths "$path"
-	[[ $length =~ ^[0-9]+$ ]] || die "Error: quiz-length \"$length\" must be a number."
-	[[ $length -gt 0 ]] || die "Error: quiz-length must be greater than zero."
-	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
-	set_gpg_recipients "$(dirname -- "$path")"
-	local quizfile="$PREFIX/$path.gpg"
-	set_git "$quizfile"
-
-	[[ $inplace -eq 0 && $force -eq 0 && -e $quizfile ]] && yesno "An entry already exists for $path. Overwrite it?"
-
-	read -r -n $length quiz < <(LC_ALL=C tr -dc "$characters" < /dev/urandom)
-	[[ ${#quiz} -eq $length ]] || die "Could not generate quiz from /dev/urandom."
-	if [[ $inplace -eq 0 ]]; then
-		echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
-	else
-		local quizfile_temp="${quizfile}.tmp.${RANDOM}.${RANDOM}.${RANDOM}.${RANDOM}.--"
-		if { echo "$quiz"; $GPG -d "${GPG_OPTS[@]}" "$quizfile" | tail -n +2; } | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile_temp" "${GPG_OPTS[@]}"; then
-			mv "$quizfile_temp" "$quizfile"
-		else
-			rm -f "$quizfile_temp"
-			die "Could not reencrypt new quiz."
-		fi
-	fi
-	local verb="Add"
-	[[ $inplace -eq 1 ]] && verb="Replace"
-	git_add_file "$quizfile" "$verb generated quiz for ${path}."
-
-  printf "\e[1mThe generated quiz for \e[4m%s\e[24m is:\e[0m\n\e[1m\e[93m%s\e[0m\n" "$path" "$quiz"
 }
 
 cmd_delete() {
@@ -619,7 +567,7 @@ case "$1" in
 	grep) shift;			cmd_grep "$@" ;;
 	insert|add) shift;		cmd_insert "$@" ;;
 	edit) shift;			cmd_edit "$@" ;;
-	generate) shift;		cmd_generate "$@" ;;
+	add) shift;		cmd_add "$@" ;;
 	delete|rm|remove) shift;	cmd_delete "$@" ;;
 	rename|mv) shift;		cmd_copy_move "move" "$@" ;;
 	copy|cp) shift;			cmd_copy_move "copy" "$@" ;;

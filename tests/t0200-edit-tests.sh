@@ -6,12 +6,12 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Test "edit" command' '
 	"$QUIZ" init $KEY1 &&
-	"$QUIZ" generate cred1 90 &&
-	export FAKE_EDITOR_QUIZ="big fat fake quiz" &&
+	"$QUIZ" insert cred1 -e <<<"$(fake-answer.sh 90)" &&
+	export FAKE_EDITOR_ANSWER="big fat fake quiz" &&
 	export PATH="$TEST_HOME:$PATH"
-	export EDITOR="fake-editor-change-quiz.sh" &&
+	export EDITOR="fake-editor-change-answer.sh" &&
 	"$QUIZ" edit cred1 &&
-	[[ $("$QUIZ" show cred1) == "$FAKE_EDITOR_QUIZ" ]]
+	[[ $("$QUIZ" show cred1) == "$FAKE_EDITOR_ANSWER" ]]
 '
 
 test_done
