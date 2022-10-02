@@ -374,14 +374,8 @@ cmd_insert() {
 		while true; do
 			read -r -p "Enter answer for $path: " -s quiz || exit 1
 			echo
-			read -r -p "Retype answer for $path: " -s quiz_again || exit 1
-			echo
-			if [[ $quiz == "$quiz_again" ]]; then
-				echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
-				break
-			else
-				die "Error: the entered quizzes do not match."
-			fi
+			echo "$quiz" | $GPG -e "${GPG_RECIPIENT_ARGS[@]}" -o "$quizfile" "${GPG_OPTS[@]}" || die "Password encryption aborted."
+			break
 		done
 	else
 		local quiz
