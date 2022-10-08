@@ -8,9 +8,27 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  ubuntu:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      - name: Run a install script
+        run: sudo make install
+      - name: Run a test script
+        run: make test
+  macos:
+    strategy:
+      matrix:
+        os: [macos-12, macos-11]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run a install script
+        run: PREFIX=$(brew --prefix) make install
+      - name: Prepare dependencies
+        run: brew install tree gnu-sed
       - name: Run a test script
         run: make test

@@ -15,6 +15,6 @@ fi
 
 GENERATED_LENGTH="${1:-25}"
 
-printf "$(cat /dev/urandom | base64 | fold -w $GENERATED_LENGTH | head -n 1)"
+printf "$(openssl rand $GENERATED_LENGTH | base64 | fold -w $GENERATED_LENGTH | head -n 1)"
 
 exit 0
