@@ -29,12 +29,6 @@ _quiz () {
 		shift words
 		# Run the completion for the subcommand
 		case "${cmd}" in
-			init)
-				_arguments : \
-					"-p[gpg-id will only be applied to this subfolder]" \
-					"--path[gpg-id will only be applied to this subfolder]"
-				_quiz_complete_keys
-				;;
 			ls|list|edit)
 				_quiz_complete_entries_with_subdirs
 				;;
@@ -108,7 +102,7 @@ _quiz_complete_entries_helper () {
 	local IFS=$'\n'
 	local prefix
 	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store}"
-	_values -C 'quizzes' ${$(find -L "$prefix" \( -name .git -o -name .gpg-id \) -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.gpg##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
+	_values -C 'quizzes' ${$(find -L "$prefix" -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.txt##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
 }
 
 _quiz_complete_entries_with_subdirs () {
@@ -117,12 +111,6 @@ _quiz_complete_entries_with_subdirs () {
 
 _quiz_complete_entries () {
 	_quiz_complete_entries_helper -type f
-}
-
-_quiz_complete_keys () {
-	local IFS=$'\n'
-	# Extract names and email addresses from gpg --list-keys
-	_values 'gpg keys' $(gpg2 --list-secret-keys --with-colons | cut -d : -f 10 | sort -u | sed '/^$/d')
 }
 
 _quiz

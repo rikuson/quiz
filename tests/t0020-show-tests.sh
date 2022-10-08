@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 . ./setup.sh
 
 test_expect_success 'Test "show" command' '
-	"$QUIZ" init $KEY1 &&
+	"$QUIZ" init &&
 	"$QUIZ" insert cred1 -e <<<"$(fake-answer.sh 20)" &&
 	"$QUIZ" show cred1
 '

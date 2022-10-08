@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 . ./setup.sh
 
 test_expect_success 'Make sure find resolves correct files' '
-	"$QUIZ" init $KEY1 &&
+	"$QUIZ" init &&
 	"$QUIZ" insert Something/neat -e <<<"$(fake-answer.sh 19)" &&
 	"$QUIZ" insert Anotherthing/okay -e <<<"$(fake-answer.sh 38)" &&
 	"$QUIZ" insert Fish -e <<<"$(fake-answer.sh 12)" &&

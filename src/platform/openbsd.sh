@@ -22,7 +22,7 @@ tmpdir() {
 		possible to create a tmpfs for temporary storage of files
 		in memory.
 		This means that it may be difficult to entirely erase
-		the temporary non-encrypted quiz file after editing.
+		the temporary quiz file after editing.
 
 		Are you sure you would like to continue?
 		_EOF

@@ -72,6 +72,6 @@ $(TESTS):
 	@$@ $(QUIZ_TEST_OPTS)
 
 clean:
-	$(RM) -rf tests/test-results/ tests/trash\ directory.*/ tests/gnupg/random_seed
+	$(RM) -rf tests/test-results/ tests/trash\ directory.*/
 
 .PHONY: install uninstall install-common test clean $(TESTS)

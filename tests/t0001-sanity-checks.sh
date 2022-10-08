@@ -9,9 +9,7 @@ test_expect_success 'Make sure we can run quiz' '
 '
 
 test_expect_success 'Make sure we can initialize our test store' '
-	"$QUIZ" init $KEY1 &&
-	[[ -e "$QUIZ_STORE_DIR/.gpg-id" ]] &&
-	[[ $(cat "$QUIZ_STORE_DIR/.gpg-id") == "$KEY1" ]]
+	"$QUIZ" init && [[ -e "$QUIZ_STORE_DIR" ]]
 '
 
 test_done

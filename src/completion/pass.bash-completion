@@ -7,7 +7,7 @@
 _quiz_complete_entries () {
 	local prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
-	local suffix=".gpg"
+	local suffix=".txt"
 	local autoexpand=${1:-0}
 
 	local IFS=$'\n'
@@ -70,16 +70,6 @@ _quiz_complete_folders () {
 	done
 }
 
-_quiz_complete_keys () {
-	local GPG="gpg"
-	command -v gpg2 &>/dev/null && GPG="gpg2"
-
-	local IFS=$'\n'
-	# Extract names and email addresses from gpg --list-keys
-	local keys="$($GPG --list-secret-keys --with-colons | cut -d : -f 10 | sort -u | sed '/^$/d')"
-	COMPREPLY+=($(compgen -W "${keys}" -- ${cur}))
-}
-
 _quiz()
 {
 	COMPREPLY=()
@@ -92,9 +82,6 @@ _quiz()
 				if [[ $lastarg == "-p" || $lastarg == "--path" ]]; then
 					_quiz_complete_folders
 					compopt -o nospace
-				else
-					COMPREPLY+=($(compgen -W "-p --path" -- ${cur}))
-					_quiz_complete_keys
 				fi
 				;;
 			ls|list|edit)

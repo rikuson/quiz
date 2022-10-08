@@ -25,10 +25,6 @@ function __fish_quiz_uses_command
     return 1
 end
 
-function __fish_quiz_print_gpg_keys
-    gpg2 --list-keys | grep uid | sed 's/.*<\(.*\)>/\1/'
-end
-
 function __fish_quiz_print
     set -l ext $argv[1]
     set -l strip $argv[2]
@@ -42,7 +38,7 @@ function __fish_quiz_print_entry_dirs
 end
 
 function __fish_quiz_print_entries
-    __fish_quiz_print ".gpg" ".gpg"
+    __fish_quiz_print ".txt" ".txt"
 end
 
 function __fish_quiz_print_entries_and_dirs
@@ -61,7 +57,6 @@ complete -c $PROG -f -n '__fish_quiz_needs_command' -a help -d 'Command: show us
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a version -d 'Command: show program version'
 
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a init -d 'Command: initialize new quiz storage'
-complete -c $PROG -f -n '__fish_quiz_uses_command init' -s p -l path -d 'Assign gpg-id for specified sub folder of quiz store'
 
 complete -c $PROG -f -n '__fish_quiz_needs_command' -a ls -d 'Command: list quizzes'
 complete -c $PROG -f -n '__fish_quiz_uses_command ls' -a "(__fish_quiz_print_entry_dirs)"
