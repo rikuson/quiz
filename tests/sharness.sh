@@ -290,7 +290,7 @@ test_debug() {
 test_eval_() {
 	# This is a separate function because some tests use
 	# "return" to end a test_expect_success block early.
-	eval </dev/null >&3 2>&4 "$*"
+	eval </dev/null >&3 "$*"
 }
 
 test_run_() {
@@ -450,7 +450,7 @@ test_expect_failure() {
 # Returns 1 if the command could not be found (exit code 127).
 # Returns 0 otherwise.
 test_must_fail() {
-	"$@"
+	"$@" 2>/dev/null
 	exit_code=$?
 	if test $exit_code = 0; then
 		echo >&2 "test_must_fail: command succeeded: $*"

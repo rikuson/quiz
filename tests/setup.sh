@@ -30,6 +30,7 @@ export GIT_DIR="$QUIZ_STORE_DIR/.git"
 export GIT_WORK_TREE="$QUIZ_STORE_DIR"
 git config --global user.email "Pass-Automated-Testing-Suite@zx2c4.com"
 git config --global user.name "Pass Automated Testing Suite"
+git config --global init.defaultBranch master
 
 
 QUIZ="$TEST_HOME/../src/quiz-store.sh"
@@ -37,3 +38,7 @@ if [[ ! -e $QUIZ ]]; then
 	echo "Could not find quiz-store.sh"
 	exit 1
 fi
+
+SED="sed"
+
+source "$TEST_HOME/../src/platform/$(uname | cut -d _ -f 1 | tr '[:upper:]' '[:lower:]').sh" 2>/dev/null # PLATFORM_FUNCTION_FILE

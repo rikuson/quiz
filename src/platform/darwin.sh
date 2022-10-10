@@ -20,3 +20,4 @@ tmpdir() {
 GETOPT="$({ test -x /usr/local/opt/gnu-getopt/bin/getopt && echo /usr/local/opt/gnu-getopt; } || brew --prefix gnu-getopt 2>/dev/null || { command -v port &>/dev/null && echo /opt/local; } || echo /usr/local)/bin/getopt"
 SHRED="srm -f -z"
 BASE64="openssl base64"
+SED="gsed"

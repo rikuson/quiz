@@ -92,6 +92,7 @@ tmpdir() {
 GETOPT="getopt"
 SHRED="shred -f -z"
 BASE64="base64"
+SED="sed"
 
 source "$(dirname "$0")/platform/$(uname | cut -d _ -f 1 | tr '[:upper:]' '[:lower:]').sh" 2>/dev/null # PLATFORM_FUNCTION_FILE
 
@@ -160,7 +161,7 @@ cmd_usage() {
 
 cmd_init() {
 	[[ $# -ne 0 ]] && die "Usage: $PROGRAM $COMMAND"
-	mkdir -v "$PREFIX"
+	mkdir -p -v "$PREFIX"
 }
 
 cmd_show() {
@@ -179,7 +180,7 @@ cmd_show() {
 		else
 			echo "${path%\/}"
 		fi
-		tree -N -C -l --noreport "$PREFIX/$path" 3>&- | tail -n +2 | sed -E 's/\.txt(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .txt at end of line, but keep colors
+		tree -N -C -l --noreport "$PREFIX/$path" 3>&- | tail -n +2 | "$SED" -E 's/\.txt(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .txt at end of line, but keep colors
 	elif [[ -z $path ]]; then
 		die "Error: quiz store is empty. Try \"quiz init\"."
 	else
@@ -191,7 +192,7 @@ cmd_find() {
 	[[ $# -eq 0 ]] && die "Usage: $PROGRAM $COMMAND quiz-names..."
 	IFS="," eval 'echo "Search Terms: $*"'
 	local terms="*$(printf '%s*|*' "$@")"
-	tree -N -C -l --noreport -P "${terms%|*}" --prune --matchdirs --ignore-case "$PREFIX" 3>&- | tail -n +2 | sed -E 's/\.txt(\x1B\[[0-9]+m)?( ->|$)/\1\2/g'
+	tree -N -C -l --noreport -P "${terms%|*}" --prune --matchdirs --ignore-case "$PREFIX" 3>&- | tail -n +2 | "$SED" -E 's/\.txt(\x1B\[[0-9]+m)?( ->|$)/\1\2/g'
 }
 
 cmd_grep() {
