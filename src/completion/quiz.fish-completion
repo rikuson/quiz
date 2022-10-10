@@ -1,4 +1,5 @@
-# Copyright (C) 2012-2014 Dmitry Medvinsky <me@dmedvinsky.name>. All Rights Reserved.
+# Copyright (C) 2012-2014 Dmitry Medvinsky <me@dmedvinsky.name> and
+# 2022 Riku Takeuchi <rikuson@users.noreply.github.com>. All Rights Reserved.
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
 set -l PROG 'quiz'
