@@ -108,12 +108,11 @@ source "$(dirname "$0")/platform/$(uname | cut -d _ -f 1 | tr '[:upper:]' '[:low
 cmd_version() {
 	cat <<-_EOF
 	============================================
-	= quiz: the standard unix quiz manager =
+	= quiz: the standard unix quiz manager     =
 	=                                          =
 	=                  v1.7.4                  =
 	=                                          =
-	=             Jason A. Donenfeld           =
-	=               Jason@zx2c4.com            =
+	=              Riku Takeuchi               =
 	=                                          =
 	=      https://github.com/rikuson/quiz     =
 	============================================

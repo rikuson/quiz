@@ -1,6 +1,7 @@
 # completion file for bash
 
-# Copyright (C) 2012 - 2014 Jason A. Donenfeld <Jason@zx2c4.com> and
+# Copyright (C) 2012 - 2014 Jason A. Donenfeld <Jason@zx2c4.com>,
+# 2022 Riku Takeuchi <rikuson@users.noreply.github.com> and
 # Brian Mattern <rephorm@rephorm.com>. All Rights Reserved.
 # This file is licensed under the GPLv2+. Please see COPYING for more information.
 
