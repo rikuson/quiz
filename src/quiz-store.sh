@@ -122,40 +122,38 @@ cmd_version() {
 cmd_usage() {
 	cmd_version
 	echo
-	cat <<-_EOF
-	Usage:
-	    $PROGRAM init
-	        Initialize new quiz storage.
-	    $PROGRAM [ls] [subfolder]
-	        List quizzes.
-	    $PROGRAM find quiz-names...
-	    	List quizzes that match quiz-names.
-	    $PROGRAM [show] quiz-name
-	        Show existing quiz.
-	    $PROGRAM grep [GREPOPTIONS] search-string
-	        Search for quiz files containing search-string when decrypted.
-	    $PROGRAM insert [--multiline,-m] [--force,-f] quiz-name
-	        Insert new quiz. Optionally, echo the quiz back to the console
-	        during entry. Or, optionally, the entry may be multiline. Prompt before
-	        overwriting existing quiz unless forced.
-	    $PROGRAM edit quiz-name
-	        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}.
-	    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name
-	        Remove existing quiz or directory, optionally forcefully.
-	    $PROGRAM mv [--force,-f] old-path new-path
-	        Renames or moves old-path to new-path, optionally forcefully.
-	    $PROGRAM cp [--force,-f] old-path new-path
-	        Copies old-path to new-path, optionally forcefully.
-	    $PROGRAM git git-command-args...
-	        If the quiz store is a git repository, execute a git command
-	        specified by git-command-args.
-	    $PROGRAM help
-	        Show this text.
-	    $PROGRAM version
-	        Show version information.
-
-	More information may be found in the quiz(1) man page.
-	_EOF
+	echo "Usage:"
+	echo "    $PROGRAM init"
+	echo "        Initialize new quiz storage."
+	echo "    $PROGRAM [ls] [subfolder]"
+	echo "        List quizzes."
+	echo "    $PROGRAM find quiz-names..."
+	echo "        List quizzes that match quiz-names."
+	echo "    $PROGRAM [show] quiz-name"
+	echo "        Show existing quiz."
+	echo "    $PROGRAM grep [GREPOPTIONS] search-string"
+	echo "        Search for quiz files containing search-string when decrypted."
+	echo "    $PROGRAM insert [--multiline,-m] [--force,-f] quiz-name"
+	echo "        Insert new quiz. Optionally, echo the quiz back to the console"
+	echo "        during entry. Or, optionally, the entry may be multiline. Prompt before"
+	echo "        overwriting existing quiz unless forced."
+	echo "    $PROGRAM edit quiz-name"
+	echo "        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}."
+	echo "    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name"
+	echo "        Remove existing quiz or directory, optionally forcefully."
+	echo "    $PROGRAM mv [--force,-f] old-path new-path"
+	echo "        Renames or moves old-path to new-path, optionally forcefully."
+	echo "    $PROGRAM cp [--force,-f] old-path new-path"
+	echo "        Copies old-path to new-path, optionally forcefully."
+	echo "    $PROGRAM git git-command-args..."
+	echo "        If the quiz store is a git repository, execute a git command"
+	echo "        specified by git-command-args."
+	echo "    $PROGRAM help"
+	echo "        Show this text."
+	echo "    $PROGRAM version"
+	echo "        Show version information."
+	echo
+	echo "More information may be found in the quiz(1) man page."
 }
 
 cmd_init() {
@@ -260,13 +258,13 @@ cmd_edit() {
 
 	local action="Add"
 	if [[ -f $quizfile ]]; then
-    cat "$quizfile" > "$tmp_file"
+		cat "$quizfile" > "$tmp_file"
 		action="Edit"
 	fi
 	${EDITOR:-vi} "$tmp_file"
 	[[ -f $tmp_file ]] || die "New quiz not saved."
 	cat "$quizfile" 2>/dev/null | diff - "$tmp_file" &>/dev/null && die "Quiz unchanged."
-  mv "$tmp_file" "$quizfile" || exit 1
+	mv "$tmp_file" "$quizfile" || exit 1
 	git_add_file "$quizfile" "$action quiz for $path using ${EDITOR:-vi}."
 }
 
