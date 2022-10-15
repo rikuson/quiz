@@ -6,13 +6,13 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Test "rm" command' '
 	"$QUIZ" init &&
-	"$QUIZ" insert cred1 -e <<<"$($TEST_HOME/fake-answer.sh 43)" &&
+	"$QUIZ" add cred1 <<<"$($TEST_HOME/fake-answer.sh 43)" &&
 	"$QUIZ" rm cred1 &&
 	[[ ! -e $QUIZ_STORE_DIR/cred1.txt ]]
 '
 
 test_expect_success 'Test "rm" command with spaces' '
-	"$QUIZ" insert "hello i have spaces" -e <<<"$($TEST_HOME/fake-answer.sh 43)" &&
+	"$QUIZ" add "hello i have spaces" <<<"$($TEST_HOME/fake-answer.sh 43)" &&
 	[[ -e $QUIZ_STORE_DIR/"hello i have spaces".txt ]] &&
 	"$QUIZ" rm "hello i have spaces" &&
 	[[ ! -e $QUIZ_STORE_DIR/"hello i have spaces".txt ]]

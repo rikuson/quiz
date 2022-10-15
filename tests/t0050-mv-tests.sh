@@ -9,7 +9,7 @@ INITIAL_QUIZ="bla bla bla will we make it!!"
 test_expect_success 'Basic move command' '
 	"$QUIZ" init &&
 	"$QUIZ" git init &&
-	"$QUIZ" insert -e cred1 <<<"$INITIAL_QUIZ" &&
+	"$QUIZ" add cred1 <<<"$INITIAL_QUIZ" &&
 	"$QUIZ" mv cred1 cred2 &&
 	[[ -e $QUIZ_STORE_DIR/cred2.txt && ! -e $QUIZ_STORE_DIR/cred1.txt ]]
 '

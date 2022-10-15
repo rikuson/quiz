@@ -80,14 +80,12 @@ program. This command is alternatively named \fBsearch\fP.
 \fBshow\fP \fIquiz-name\fP
 Decrypt and print a quiz named \fIquiz-name\fP.
 .TP
-\fBadd\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIquiz-name\fP
+\fBadd\fP [ \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIquiz-name\fP
 Insert a new quiz into the quiz store called \fIquiz-name\fP. This will
-read the new quiz from standard in. If \fI--echo\fP or \fI-e\fP is \fInot\fP specified,
-disable keyboard echo when the quiz is entered and confirm the quiz by asking
-for it twice. If \fI--multiline\fP or \fI-m\fP is specified, lines will be read until
-EOF or Ctrl+D is reached. Otherwise, only a single line from standard in is read. Prompt
-before overwriting an existing quiz, unless \fI--force\fP or \fI-f\fP is specified. This
-command is alternatively named \fBinsert\fP.
+read the new quiz from standard in. If \fI--multiline\fP or \fI-m\fP is specified, lines
+will be read until EOF or Ctrl+D is reached. Otherwise, only a single line from standard
+in is read. Prompt before overwriting an existing quiz, unless \fI--force\fP or \fI-f\fP
+is specified. This command is alternatively named \fBinsert\fP.
 .TP
 \fBedit\fP \fIquiz-name\fP
 Insert a new quiz or edit an existing quiz using the default text editor specified

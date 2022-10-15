@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Test "edit" command' '
 	"$QUIZ" init &&
-	"$QUIZ" insert cred1 -e <<<"$($TEST_HOME/fake-answer.sh 90)" &&
+	"$QUIZ" add cred1 <<<"$($TEST_HOME/fake-answer.sh 90)" &&
 	export FAKE_EDITOR_ANSWER="big fat fake quiz" &&
 	export PATH="$TEST_HOME:$PATH"
 	export EDITOR="fake-editor-change-answer.sh" &&
