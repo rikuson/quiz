@@ -11,9 +11,9 @@ tmpdir() {
 		SECURE_TMPDIR="$(mktemp -d "${TMPDIR:-/tmp}/$template")"
 		mount -t tmpfs -o -s16M tmpfs "$SECURE_TMPDIR" || die "Error: could not create tmpfs."
 		unmount_tmpdir() {
-			 [[ -n $SECURE_TMPDIR && -d $SECURE_TMPDIR ]] || return
-			 umount "$SECURE_TMPDIR"
-			 rm -rf "$SECURE_TMPDIR"
+			[[ -n $SECURE_TMPDIR && -d $SECURE_TMPDIR ]] || return
+			umount "$SECURE_TMPDIR"
+			rm -rf "$SECURE_TMPDIR"
 		}
 		trap unmount_tmpdir INT TERM EXIT
 	else
