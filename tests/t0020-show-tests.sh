@@ -11,7 +11,7 @@ test_expect_success 'Test "show" command' '
 '
 
 test_expect_success 'Test "show" command with spaces' '
-	"$QUIZ" add "I am a cred with lots of spaces"<<<"BLAH!!" &&
+	"$QUIZ" add -m "I am a cred with lots of spaces"<<<"BLAH!!" &&
 	[[ $("$QUIZ" show "I am a cred with lots of spaces") == "BLAH!!" ]]
 '
 

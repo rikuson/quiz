@@ -39,7 +39,7 @@ function __fish_quiz_print_entry_dirs
 end
 
 function __fish_quiz_print_entries
-    __fish_quiz_print ".txt" ".txt"
+    __fish_quiz_print ".yml" ".yml"
 end
 
 function __fish_quiz_print_entries_and_dirs
