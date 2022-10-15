@@ -1,7 +1,7 @@
-.TH QUIZ 1 "2022 October 2" Riku Takeuchi "Quiz Store"
+.TH QUIZ 1 "2022 October 2" "Riku Takeuchi" "Quiz"
 
 .SH NAME
-quiz - stores, retrieves, inserts, and synchronizes quizzes
+quiz - flash cards application
 
 .SH SYNOPSIS
 .B quiz
@@ -16,7 +16,7 @@ quiz - stores, retrieves, inserts, and synchronizes quizzes
 .SH DESCRIPTION
 
 .B quiz 
-is a very simple quiz store that keeps quizzes inside 
+is flash cards application which helps you learn new things.
 The
 .B quiz
 utility provides a series of commands for manipulating the quiz store,
@@ -80,14 +80,14 @@ program. This command is alternatively named \fBsearch\fP.
 \fBshow\fP \fIquiz-name\fP
 Decrypt and print a quiz named \fIquiz-name\fP.
 .TP
-\fBinsert\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIquiz-name\fP
+\fBadd\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIquiz-name\fP
 Insert a new quiz into the quiz store called \fIquiz-name\fP. This will
 read the new quiz from standard in. If \fI--echo\fP or \fI-e\fP is \fInot\fP specified,
 disable keyboard echo when the quiz is entered and confirm the quiz by asking
 for it twice. If \fI--multiline\fP or \fI-m\fP is specified, lines will be read until
 EOF or Ctrl+D is reached. Otherwise, only a single line from standard in is read. Prompt
 before overwriting an existing quiz, unless \fI--force\fP or \fI-f\fP is specified. This
-command is alternatively named \fBadd\fP.
+command is alternatively named \fBinsert\fP.
 .TP
 \fBedit\fP \fIquiz-name\fP
 Insert a new quiz or edit an existing quiz using the default text editor specified
@@ -136,122 +136,154 @@ Show version information.
 
 .TP
 Initialize quiz store
-.B zx2c4@laptop ~ $ quiz init
+.B $ quiz init
 .br
-mkdir: created directory \[u2018]/home/zx2c4/.quiz-store\[u2019] 
+mkdir: created directory \[u2018]/home/rikuson/.quiz-store\[u2019] 
 .br
 Quiz store initialized
 .TP
 List existing quizzes in store
-.B zx2c4@laptop ~ $ quiz 
+.B $ quiz 
 .br
 Quiz Store
 .br
-\[u251C]\[u2500]\[u2500] Business 
+\[u251C]\[u2500]\[u2500] rust
 .br
-\[u2502]   \[u251C]\[u2500]\[u2500] some-silly-business-site.com 
+\[u2502]   \[u251C]\[u2500]\[u2500] 001-macro-count-statements
 .br
-\[u2502]   \[u2514]\[u2500]\[u2500] another-business-site.net 
+\[u2502]   \[u2514]\[u2500]\[u2500] 002-bitand-or-reference
 .br
-\[u251C]\[u2500]\[u2500] Email 
+\[u251C]\[u2500]\[u2500] deep-learning
 .br
-\[u2502]   \[u251C]\[u2500]\[u2500] donenfeld.com 
+\[u2502]   \[u251C]\[u2500]\[u2500] 001-logical-gate
 .br
-\[u2502]   \[u2514]\[u2500]\[u2500] zx2c4.com 
+\[u2502]   \[u2514]\[u2500]\[u2500] 002-segmentation
 .br
-\[u2514]\[u2500]\[u2500] France 
+\[u2514]\[u2500]\[u2500] aws-certification
 .br
-    \[u251C]\[u2500]\[u2500] bank 
+    \[u251C]\[u2500]\[u2500] 001-auto-scaling
 .br
-    \[u251C]\[u2500]\[u2500] freebox 
+    \[u251C]\[u2500]\[u2500] 002-s3-object
 .br
-    \[u2514]\[u2500]\[u2500] mobilephone  
+    \[u2514]\[u2500]\[u2500] 003-cloud-front
 .br
 
 .br
 Alternatively, "\fBquiz ls\fP".
 .TP
-Find existing quizzes in store that match .com
-.B zx2c4@laptop ~ $ quiz find .com
+Find existing quizzes in store that match 002
+.B $ quiz find 002
 .br
-Search Terms: .com
+Search Terms: 002
 .br
-\[u251C]\[u2500]\[u2500] Business 
+\[u251C]\[u2500]\[u2500] rust 
 .br
-\[u2502]   \[u251C]\[u2500]\[u2500] some-silly-business-site.com 
+\[u2502]   \[u2514]\[u2500]\[u2500] 002-segmentation
 .br
-\[u2514]\[u2500]\[u2500] Email 
+\[u251C]\[u2500]\[u2500] deep-learning
 .br
-    \[u251C]\[u2500]\[u2500] donenfeld.com 
+\[u2502]   \[u2514]\[u2500]\[u2500] 002-segmentation
 .br
-    \[u2514]\[u2500]\[u2500] zx2c4.com 
+\[u2514]\[u2500]\[u2500] aws-certification
+.br
+    \[u251C]\[u2500]\[u2500] 002-s3-object
 .br
 
 .br
-Alternatively, "\fBquiz search .com\fP".
+Alternatively, "\fBquiz search 002\fP".
 .TP
 Show existing quiz
-.B zx2c4@laptop ~ $ quiz Email/zx2c4.com 
+.B $ quiz rust/001-macro-count-statements 
 .br
-sup3rh4x3rizmynam3 
+112
 .TP
 Add quiz to store
-.B zx2c4@laptop ~ $ quiz insert Business/cheese-whiz-factory 
+.B $ quiz add rust/001-macro-count-statements 
 .br
-Enter quiz for Business/cheese-whiz-factory: omg so much cheese what am i gonna do
+Enter answer for rust/002-bitand-or-reference: 112
 .TP
 Add multiline quiz to store 
-.B zx2c4@laptop ~ $ quiz insert -m Business/cheese-whiz-factory 
+.B $ quiz add -m rust/001-macro-count-statements
 .br
-Enter contents of Business/cheese-whiz-factory and press Ctrl+D when finished: 
+Enter quiz of rust/002-bitand-or-reference and press Ctrl+D when finished
 .br
  
 .br
-Hey this is my 
+What is the output of this Rust program?
 .br
-awesome 
+
 .br
-multi 
+```rust
 .br
-line 
+macro_rules! m {
 .br
-quizworrrrrrrrd. 
+    ($($s:stmt)*) => {
+.br
+        $(
+.br
+            { stringify!($s); 1 }
+.br
+        )<<*
+.br
+    };
+.br
+}
+.br
+
+.br
+fn main() {
+.br
+    print!(
+.br
+        "{}{}{}",
+.br
+        m! { return || true },
+.br
+        m! { (return) || true },
+.br
+        m! { {return} || true },
+.br
+    );
+.br
+}
+.br
+```
 .br
 ^D 
 .TP
 Remove quiz from store
-.B zx2c4@laptop ~ $ quiz remove Business/cheese-whiz-factory 
+.B $ quiz rm rust/001-macro-count-statements
 .br
-rm: remove regular file \[u2018]/home/zx2c4/.quiz-store/Business/cheese-whiz-factory.txt\[u2019]? y 
+rm: remove regular file \[u2018]/home/rikuson/.quiz-store/rust/001-macro-count-statements.txt\[u2019]? y
 .br
-removed \[u2018]/home/zx2c4/.quiz-store/Business/cheese-whiz-factory.txt\[u2019]
+removed \[u2018]/home/rikuson/.quiz-store/rust/001-macro-count-statements.txt\[u2019]
 
 .SH EXTENDED GIT EXAMPLE
 Here, we initialize new quiz store, create a git repository, and then manipulate and sync quizzes. Make note of the arguments to the first call of \fBquiz git push\fP; consult
 .BR git-push (1)
 for more information.
 
-.B zx2c4@laptop ~ $ quiz init
+.B $ quiz init
 .br
-mkdir: created directory \[u2018]/home/zx2c4/.quiz-store\[u2019] 
+mkdir: created directory \[u2018]/home/rikuson/.quiz-store\[u2019] 
 .br
 Quiz store initialized
 
-.B zx2c4@laptop ~ $ quiz git init 
+.B $ quiz git init 
 .br
-Initialized empty Git repository in /home/zx2c4/.quiz-store/.git/
+Initialized empty Git repository in /home/rikuson/.quiz-store/.git/
 
-.B zx2c4@laptop ~ $ quiz git remote add origin kexec.com:quiz-store 
+.B $ quiz git remote add origin git@github.com:rikuson/quiz-store.git
 
-.B zx2c4@laptop ~ $ quiz insert Amazon/amazonemail@email.com
+.B $ quiz add whoami
 .br
-Enter answer for Amazon/amazonemail@email.com:
+Enter answer for whoami:
 .br
-1 file changed, 0 insertions(+), 0 deletions(-) 
+1 file changed, 0 insertions(+), 0 deletions(-)
 .br
-create mode 100644 Amazon/amazonemail@email.com.txt 
+create mode 100644 whoami.txt
 
-.B zx2c4@laptop ~ $ quiz git push -u --all
+.B $ quiz git push -u --all
 .br
 Counting objects: 4, done. 
 .br
@@ -263,37 +295,37 @@ Writing objects: 100% (4/4), 921 bytes, done.
 .br
 Total 4 (delta 0), reused 0 (delta 0) 
 .br
-To kexec.com:quiz-store 
+To git@github.com:rikuson/quiz-store.git
 .br
 * [new branch]      master -> master 
 .br
 Branch master set up to track remote branch master from origin. 
 
-.B zx2c4@laptop ~ $ quiz insert Amazon/otheraccount@email.com 
+.B $ quiz add whoareyou
 .br
-Enter quiz for Amazon/otheraccount@email.com: som3r3a11yb1gp4ssw0rd!!88** 
+Enter answer for whoareyou: anonymous
 .br
-[master b9b6746] Added given quiz for Amazon/otheraccount@email.com to store. 
-.br
-1 file changed, 0 insertions(+), 0 deletions(-) 
-.br
-create mode 100644 Amazon/otheraccount@email.com.txt 
-
-.B zx2c4@laptop ~ $ quiz rm Amazon/amazonemail@email.com 
-.br
-rm: remove regular file \[u2018]/home/zx2c4/.quiz-store/Amazon/amazonemail@email.com.txt\[u2019]? y 
-.br
-removed \[u2018]/home/zx2c4/.quiz-store/Amazon/amazonemail@email.com.txt\[u2019] 
-.br
-rm 'Amazon/amazonemail@email.com.txt' 
-.br
-[master 288b379] Removed Amazon/amazonemail@email.com from store. 
+[master b9b6746] Added given quiz for whoareyou to store.
 .br
 1 file changed, 0 insertions(+), 0 deletions(-) 
 .br
-delete mode 100644 Amazon/amazonemail@email.com.txt 
+create mode 100644 whoareyou.txt
 
-.B zx2c4@laptop ~ $ quiz git push
+.B $ quiz rm whoami
+.br
+rm: remove regular file \[u2018]/home/rikuson/.quiz-store/whoami.txt\[u2019]? y 
+.br
+removed \[u2018]/home/rikuson/.quiz-store/whoami.txt\[u2019] 
+.br
+rm 'whoami.txt'
+.br
+[master 288b379] Removed whoami from store.
+.br
+1 file changed, 0 insertions(+), 0 deletions(-) 
+.br
+delete mode 100644 whoami.txt
+
+.B $ quiz git push
 .br
 Counting objects: 9, done. 
 .br
@@ -305,7 +337,7 @@ Writing objects: 100% (7/7), 1.25 KiB, done.
 .br
 Total 7 (delta 0), reused 0 (delta 0) 
 .br
-To kexec.com:quiz-store
+To git@github.com:rikuson/quiz-store.git
 
 .SH FILES
 
@@ -341,7 +373,6 @@ The location of the text editor used by \fBedit\fP.
 .SH AUTHOR
 .B quiz
 was written by
-.MT rikuson@users.noreply.github.com
 Riku Takeuchi and
 .MT Jason@zx2c4.com
 Jason A. Donenfeld
