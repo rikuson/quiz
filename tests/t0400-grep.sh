@@ -6,11 +6,11 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Make sure grep prints normal lines' '
 	"$QUIZ" init &&
-	"$QUIZ" insert -e blah1 <<<"hello" &&
-	"$QUIZ" insert -e blah2 <<<"my name is" &&
-	"$QUIZ" insert -e folder/blah3 <<<"I hate computers" &&
-	"$QUIZ" insert -e blah4 <<<"me too!" &&
-	"$QUIZ" insert -e folder/where/blah5 <<<"They are hell" &&
+	"$QUIZ" add blah1 <<<"hello" &&
+	"$QUIZ" add blah2 <<<"my name is" &&
+	"$QUIZ" add folder/blah3 <<<"I hate computers" &&
+	"$QUIZ" add blah4 <<<"me too!" &&
+	"$QUIZ" add folder/where/blah5 <<<"They are hell" &&
 	results="$("$QUIZ" grep hell)" &&
 	[[ $(wc -l <<<"$results") -eq 4 ]] &&
 	grep -q blah5 <<<"$results" &&
@@ -20,10 +20,10 @@ test_expect_success 'Make sure grep prints normal lines' '
 
 test_expect_success 'Test passing the "-i" option to grep' '
 	"$QUIZ" init &&
-	"$QUIZ" insert -e blah1 <<<"I wonder..." &&
-	"$QUIZ" insert -e blah2 <<<"Will it ignore" &&
-	"$QUIZ" insert -e blah3 <<<"case when searching?" &&
-	"$QUIZ" insert -e folder/blah4 <<<"Yes, it does. Wonderful!" &&
+	"$QUIZ" add blah1 <<<"I wonder..." &&
+	"$QUIZ" add blah2 <<<"Will it ignore" &&
+	"$QUIZ" add blah3 <<<"case when searching?" &&
+	"$QUIZ" add folder/blah4 <<<"Yes, it does. Wonderful!" &&
 	results="$("$QUIZ" grep -i wonder)" &&
 	[[ $(wc -l <<<"$results") -eq 4 ]] &&
 	grep -q blah1 <<<"$results" &&

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-test_description='Test insert'
+test_description='Test add'
 cd "$(dirname "$0")"
 . ./setup.sh
 
-test_expect_success 'Test "insert" command' '
+test_expect_success 'Test "add" command' '
 	"$QUIZ" init &&
-	echo "Hello world" | "$QUIZ" insert -e cred1 &&
+	echo "Hello world" | "$QUIZ" add cred1 &&
 	[[ $("$QUIZ" show cred1) == "Hello world" ]]
 '
 

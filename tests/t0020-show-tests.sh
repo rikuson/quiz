@@ -6,17 +6,17 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Test "show" command' '
 	"$QUIZ" init &&
-	"$QUIZ" insert cred1 -e <<<"$($TEST_HOME/fake-answer.sh 20)" &&
+	"$QUIZ" add cred1 <<<"$($TEST_HOME/fake-answer.sh 20)" &&
 	"$QUIZ" show cred1
 '
 
 test_expect_success 'Test "show" command with spaces' '
-	"$QUIZ" insert -e "I am a cred with lots of spaces"<<<"BLAH!!" &&
+	"$QUIZ" add "I am a cred with lots of spaces"<<<"BLAH!!" &&
 	[[ $("$QUIZ" show "I am a cred with lots of spaces") == "BLAH!!" ]]
 '
 
 test_expect_success 'Test "show" command with unicode' '
-	"$QUIZ" insert 🏠 -e <<<"$(printf "fakeanswer")" &&
+	"$QUIZ" add 🏠 <<<"$(printf "fakeanswer")" &&
 	"$QUIZ" show | grep -q '🏠'
 '
 

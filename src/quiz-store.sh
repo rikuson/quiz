@@ -134,7 +134,7 @@ cmd_usage() {
 	        Show existing quiz.
 	    $PROGRAM grep [GREPOPTIONS] search-string
 	        Search for quiz files containing search-string when decrypted.
-	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] quiz-name
+	    $PROGRAM insert [--multiline,-m] [--force,-f] quiz-name
 	        Insert new quiz. Optionally, echo the quiz back to the console
 	        during entry. Or, optionally, the entry may be multiline. Prompt before
 	        overwriting existing quiz unless forced.
@@ -211,18 +211,17 @@ cmd_grep() {
 }
 
 cmd_insert() {
-	local opts multiline=0 noecho=1 force=0
+	local opts multiline=0 force=0
 	opts="$($GETOPT -o mef -l multiline,echo,force -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
 	while true; do case $1 in
 		-m|--multiline) multiline=1; shift ;;
-		-e|--echo) noecho=0; shift ;;
 		-f|--force) force=1; shift ;;
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || ( $multiline -eq 1 && $noecho -eq 0 ) || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--echo,-e | --multiline,-m] [--force,-f] quiz-name"
+	[[ $err -ne 0 || $multiline -eq 1 || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--multiline,-m] [--force,-f] quiz-name"
 	local path="${1%/}"
 	local quizfile="$PREFIX/$path.txt"
 	check_sneaky_paths "$path"
@@ -233,18 +232,10 @@ cmd_insert() {
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
 
 	if [[ $multiline -eq 1 ]]; then
-		echo "Enter contents of $path and press Ctrl+D when finished:"
+		echo "Enter quiz of $path and press Ctrl+D when finished:"
 		echo
-    local quiz=$(cat)
+		local quiz=$(cat)
 		echo "$quiz" > "$quizfile" || exit 1
-	elif [[ $noecho -eq 1 ]]; then
-		local quiz
-		while true; do
-			read -r -p "Enter answer for $path: " -s quiz || exit 1
-			echo
-			echo "$quiz" > "$quizfile" || exit 1
-			break
-		done
 	else
 		local quiz
 		read -r -p "Enter answer for $path: " -e quiz
