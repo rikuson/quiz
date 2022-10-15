@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 test_expect_success 'Test "add" command' '
 	"$QUIZ" init &&
-	echo "Hello world" | "$QUIZ" add cred1 &&
+	echo "Hello world" | "$QUIZ" add -m cred1 &&
 	[[ $("$QUIZ" show cred1) == "Hello world" ]]
 '
 

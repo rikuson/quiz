@@ -103,7 +103,7 @@ _quiz_complete_entries_helper () {
 	local IFS=$'\n'
 	local prefix
 	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store}"
-	_values -C 'quizzes' ${$(find -L "$prefix" -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.txt##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
+	_values -C 'quizzes' ${$(find -L "$prefix" -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.yml##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
 }
 
 _quiz_complete_entries_with_subdirs () {

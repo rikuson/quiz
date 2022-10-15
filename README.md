@@ -98,9 +98,9 @@ fn main() {
 ```bash
 $ quiz rm rust/001-macro-count-statements
 rm: remove regular file ‘/home/rikuson/.quiz-
-store/rust/001-macro-count-statements.txt’? y
+store/rust/001-macro-count-statements.yml’? y
 removed ‘/home/rikuson/.quiz-store/rust/001-macro-
-count-statements.txt’
+count-statements.yml’
 ```
 
 ## Extended Git Example
@@ -121,7 +121,7 @@ $ quiz git remote add origin git@github.com:rikuson/quiz-store.git
 $ quiz add whoami
 Enter answer for whoami:
 1 file changed, 0 insertions(+), 0 deletions(-)
-create mode 100644 whoami.txt
+create mode 100644 whoami.yml
 
 $ quiz git push -u --all
 Counting objects: 4, done.
@@ -138,15 +138,15 @@ Enter answer for whoareyou:
 anonymous
 [master b9b6746] Added given quiz for whoareyou to store.
 1 file changed, 0 insertions(+), 0 deletions(-)
-create mode 100644 whoareyou.txt
+create mode 100644 whoareyou.yml
 
 $ quiz rm whoami
-rm: remove regular file ‘/home/rikuson/.quiz-store/whoami.txt’? y
-removed ‘/home/zx2c4/.quiz-store/whoami.txt’
-rm 'whoami.txt'
+rm: remove regular file ‘/home/rikuson/.quiz-store/whoami.yml’? y
+removed ‘/home/zx2c4/.quiz-store/whoami.yml’
+rm 'whoami.yml'
 [master 288b379] Removed whoami from store.
 1 file changed, 0 insertions(+), 0 deletions(-)
-delete mode 100644 whoami.txt
+delete mode 100644 whoami.yml
 
 $ quiz git push
 Counting objects: 9, done.

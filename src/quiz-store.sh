@@ -168,18 +168,18 @@ cmd_show() {
 
 	local quiz
 	local path="$1"
-	local quizfile="$PREFIX/$path.txt"
+	local quizfile="$PREFIX/$path.yml"
 	check_sneaky_paths "$path"
 	if [[ -f $quizfile ]]; then
-    quiz="$(cat "$quizfile" | $BASE64)" || exit $?
-    echo "$quiz" | $BASE64 -d
+		quiz="$(cat "$quizfile")" || exit $?
+		echo "$quiz"
 	elif [[ -d $PREFIX/$path ]]; then
 		if [[ -z $path ]]; then
 			echo "Quiz Store"
 		else
 			echo "${path%\/}"
 		fi
-		tree -N -C -l --noreport "$PREFIX/$path" 3>&- | tail -n +2 | "$SED" -E 's/\.txt(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .txt at end of line, but keep colors
+		tree -N -C -l --noreport "$PREFIX/$path" 3>&- | tail -n +2 | "$SED" -E 's/\.yml(\x1B\[[0-9]+m)?( ->|$)/\1\2/g' # remove .yml at end of line, but keep colors
 	elif [[ -z $path ]]; then
 		die "Error: quiz store is empty. Try \"quiz init\"."
 	else
@@ -191,7 +191,7 @@ cmd_find() {
 	[[ $# -eq 0 ]] && die "Usage: $PROGRAM $COMMAND quiz-names..."
 	IFS="," eval 'echo "Search Terms: $*"'
 	local terms="*$(printf '%s*|*' "$@")"
-	tree -N -C -l --noreport -P "${terms%|*}" --prune --matchdirs --ignore-case "$PREFIX" 3>&- | tail -n +2 | "$SED" -E 's/\.txt(\x1B\[[0-9]+m)?( ->|$)/\1\2/g'
+	tree -N -C -l --noreport -P "${terms%|*}" --prune --matchdirs --ignore-case "$PREFIX" 3>&- | tail -n +2 | "$SED" -E 's/\.yml(\x1B\[[0-9]+m)?( ->|$)/\1\2/g'
 }
 
 cmd_grep() {
@@ -200,19 +200,19 @@ cmd_grep() {
 	while read -r -d "" quizfile; do
 		grepresults="$(cat "$quizfile" | grep --color=always "$@")"
 		[[ $? -ne 0 ]] && continue
-		quizfile="${quizfile%.txt}"
+		quizfile="${quizfile%.yml}"
 		quizfile="${quizfile#$PREFIX/}"
 		local quizfile_dir="${quizfile%/*}/"
 		[[ $quizfile_dir == "${quizfile}/" ]] && quizfile_dir=""
 		quizfile="${quizfile##*/}"
 		printf "\e[94m%s\e[1m%s\e[0m:\n" "$quizfile_dir" "$quizfile"
 		echo "$grepresults"
-	done < <(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.txt' -print0)
+	done < <(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.yml' -print0)
 }
 
 cmd_insert() {
 	local opts multiline=0 force=0
-	opts="$($GETOPT -o mef -l multiline,echo,force -n "$PROGRAM" -- "$@")"
+	opts="$($GETOPT -o mf -l multiline,force -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
 	while true; do case $1 in
@@ -221,9 +221,9 @@ cmd_insert() {
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || $multiline -eq 1 || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--multiline,-m] [--force,-f] quiz-name"
+	[[ $err -ne 0 || $# -ne 1 ]] && die "Usage: $PROGRAM $COMMAND [--multiline,-m] [--force,-f] quiz-name"
 	local path="${1%/}"
-	local quizfile="$PREFIX/$path.txt"
+	local quizfile="$PREFIX/$path.yml"
 	check_sneaky_paths "$path"
 	set_git "$quizfile"
 
@@ -237,9 +237,11 @@ cmd_insert() {
 		local quiz=$(cat)
 		echo "$quiz" > "$quizfile" || exit 1
 	else
-		local quiz
-		read -r -p "Enter answer for $path: " -e quiz
-		echo "$quiz" > "$quizfile" || exit 1
+		local quiz question answer
+		read -r -p "Enter question for $path: " -e question
+		read -r -p "Enter answer for $path: " -e answer
+		quiz="question: $question\nanswer: $answer"
+		echo -e "$quiz" > "$quizfile" || exit 1
 	fi
 	git_add_file "$quizfile" "Add given answer for $path to store."
 }
@@ -250,11 +252,11 @@ cmd_edit() {
 	local path="${1%/}"
 	check_sneaky_paths "$path"
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
-	local quizfile="$PREFIX/$path.txt"
+	local quizfile="$PREFIX/$path.yml"
 	set_git "$quizfile"
 
 	tmpdir #Defines $SECURE_TMPDIR
-	local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}.txt"
+	local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}.yml"
 
 	local action="Add"
 	if [[ -f $quizfile ]]; then
@@ -283,7 +285,7 @@ cmd_delete() {
 	check_sneaky_paths "$path"
 
 	local quizdir="$PREFIX/${path%/}"
-	local quizfile="$PREFIX/$path.txt"
+	local quizfile="$PREFIX/$path.yml"
 	[[ -f $quizfile && -d $quizdir && $path == */ || ! -f $quizfile ]] && quizfile="${quizdir%/}/"
 	[[ -e $quizfile ]] || die "Error: $path is not in the quiz store."
 	set_git "$quizfile"
@@ -317,15 +319,15 @@ cmd_copy_move() {
 	local old_dir="$old_path"
 	local new_path="$PREFIX/$2"
 
-	if ! [[ -f $old_path.txt && -d $old_path && $1 == */ || ! -f $old_path.txt ]]; then
+	if ! [[ -f $old_path.yml && -d $old_path && $1 == */ || ! -f $old_path.yml ]]; then
 		old_dir="${old_path%/*}"
-		old_path="${old_path}.txt"
+		old_path="${old_path}.yml"
 	fi
 	echo "$old_path"
 	[[ -e $old_path ]] || die "Error: $1 is not in the quiz store."
 
 	mkdir -p -v "${new_path%/*}"
-	[[ -d $old_path || -d $new_path || $new_path == */ ]] || new_path="${new_path}.txt"
+	[[ -d $old_path || -d $new_path || $new_path == */ ]] || new_path="${new_path}.yml"
 
 	local interactive="-i"
 	[[ ! -t 0 || $force -eq 1 ]] && interactive="-f"

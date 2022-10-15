@@ -8,7 +8,7 @@
 _quiz_complete_entries () {
 	local prefix="${QUIZ_STORE_DIR:-$HOME/.quiz-store/}"
 	prefix="${prefix%/}/"
-	local suffix=".txt"
+	local suffix=".yml"
 	local autoexpand=${1:-0}
 
 	local IFS=$'\n'

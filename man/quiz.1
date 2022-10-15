@@ -252,9 +252,9 @@ fn main() {
 Remove quiz from store
 .B $ quiz rm rust/001-macro-count-statements
 .br
-rm: remove regular file \[u2018]/home/rikuson/.quiz-store/rust/001-macro-count-statements.txt\[u2019]? y
+rm: remove regular file \[u2018]/home/rikuson/.quiz-store/rust/001-macro-count-statements.yml\[u2019]? y
 .br
-removed \[u2018]/home/rikuson/.quiz-store/rust/001-macro-count-statements.txt\[u2019]
+removed \[u2018]/home/rikuson/.quiz-store/rust/001-macro-count-statements.yml\[u2019]
 
 .SH EXTENDED GIT EXAMPLE
 Here, we initialize new quiz store, create a git repository, and then manipulate and sync quizzes. Make note of the arguments to the first call of \fBquiz git push\fP; consult
@@ -279,7 +279,7 @@ Enter answer for whoami:
 .br
 1 file changed, 0 insertions(+), 0 deletions(-)
 .br
-create mode 100644 whoami.txt
+create mode 100644 whoami.yml
 
 .B $ quiz git push -u --all
 .br
@@ -307,21 +307,21 @@ Enter answer for whoareyou: anonymous
 .br
 1 file changed, 0 insertions(+), 0 deletions(-) 
 .br
-create mode 100644 whoareyou.txt
+create mode 100644 whoareyou.yml
 
 .B $ quiz rm whoami
 .br
-rm: remove regular file \[u2018]/home/rikuson/.quiz-store/whoami.txt\[u2019]? y 
+rm: remove regular file \[u2018]/home/rikuson/.quiz-store/whoami.yml\[u2019]? y
 .br
-removed \[u2018]/home/rikuson/.quiz-store/whoami.txt\[u2019] 
+removed \[u2018]/home/rikuson/.quiz-store/whoami.yml\[u2019]
 .br
-rm 'whoami.txt'
+rm 'whoami.yml'
 .br
 [master 288b379] Removed whoami from store.
 .br
 1 file changed, 0 insertions(+), 0 deletions(-) 
 .br
-delete mode 100644 whoami.txt
+delete mode 100644 whoami.yml
 
 .B $ quiz git push
 .br
