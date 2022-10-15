@@ -12,8 +12,7 @@ test_expect_success 'Make sure find resolves correct files' '
 	"$QUIZ" insert Fishthings -e <<<"$($TEST_HOME/fake-answer.sh 122)" &&
 	"$QUIZ" insert Fishies/stuff -e <<<"$($TEST_HOME/fake-answer.sh 21)" &&
 	"$QUIZ" insert Fishies/otherstuff -e <<<"$($TEST_HOME/fake-answer.sh 1234)" &&
-	echo $("$QUIZ" find fish | "$SED" "s/[^ ]* //g;s/$(printf \\x1b)\\[[0-9;]*[a-zA-Z]//g" | tr "\\n" -) &&
-	[[ $("$QUIZ" find fish | "$SED" "s/[^ ]* //g;s/$(printf \\x1b)\\[[0-9;]*[a-zA-Z]//g" | tr "\\n" -) == "fish-Fish-Fishies-otherstuff-stuff-Fishthings-" ]]
+	[[ $("$QUIZ" find fish | "$SED" "s/^[ \`|-]*//g;s/$(echo -ne "\u251C\|\u2500\|\u2502\|\u2514")//g;s/$(printf \\x1b)\\[[0-9;]*[a-zA-Z]//g" | tr "\\n" -) == "Search Terms: fish-Fish-Fishies-otherstuff-stuff-Fishthings-" ]]
 '
 
 test_done
