@@ -17,6 +17,19 @@ test_expect_success 'Test super command' '
 	[[ $actual == $expected ]]
 '
 
+test_expect_success 'Test case insentive' '
+	"$QUIZ" init &&
+	answer1=answer1 &&
+	answer2=AnSwEr2 &&
+	answer3=ANSWER3 &&
+	printf "question1\n${answer1}" | "$QUIZ" add quiz1 &&
+	printf "question2\n${answer2}" | "$QUIZ" add quiz2 &&
+	printf "question3\n${answer3}" | "$QUIZ" add quiz3 &&
+	expected="Q) question1-OK--Q) question2-OK--Q) question3-OK--" &&
+	actual="$(printf "ANSWER1\naNsWeR2\nanswer3" | "$QUIZ" | "$SED" "s/\x1B\[[0-9;]\{1,\}[A-Za-z]//g" | tr "\\n" -)" &&
+	[[ $actual == $expected ]]
+'
+
 test_expect_failure 'Test empty quiz store' '
 	"$QUIZ"
 '
