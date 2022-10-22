@@ -167,8 +167,8 @@ cmd_super() {
 	fi
 	while read quizfile <&3; do
 		[[ $quizfile == "" ]] && die "Error: there is no matched quiz found."
-		grep '^question:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`question\` is missing."
-		grep '^answer:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`answer\` is missing."
+		grep '^question:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`question\` is missing in $quizfile."
+		grep '^answer:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`answer\` is missing in $quizfile."
 		yq -r . "$quizfile" > /dev/null 2>&1 || die "Error: invalid quiz schema."
 
 		local question=$(yq -r .question "$quizfile")
@@ -177,7 +177,9 @@ cmd_super() {
 		echo "$question" | tail -n +2
 		local input
 		read -r -p "A) " -e input
-		if [[ $input == $answer ]]; then
+		local expected=$(tr '[a-z]' '[A-Z]' <<< $answer)
+		local actual=$(tr '[a-z]' '[A-Z]' <<< $input)
+		if [[ ${actual} == ${expected} ]]; then
 			tput setaf 2
 			echo "OK"
 		else
