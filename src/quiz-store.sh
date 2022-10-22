@@ -161,6 +161,34 @@ cmd_init() {
 	mkdir -p -v "$PREFIX"
 }
 
+cmd_super() {
+	if ! [[ -e $PREFIX ]]; then
+		die "Error: quiz store is empty. Try \"quiz init\"."
+	fi
+	while read quizfile <&3; do
+		[[ $quizfile == "" ]] && die "Error: there is no matched quiz found."
+		grep '^question:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`question\` is missing."
+		grep '^answer:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`answer\` is missing."
+		yq -r . "$quizfile" > /dev/null 2>&1 || die "Error: invalid quiz schema."
+
+		local question=$(yq -r .question "$quizfile")
+		local answer=$(yq -r .answer "$quizfile")
+		echo "Q) $question" | head -n 1
+		echo "$question" | tail -n +2
+		local input
+		read -r -p "A) " -e input
+		if [[ $input == $answer ]]; then
+			tput setaf 2
+			echo "OK"
+		else
+			tput setaf 1
+			echo $answer
+		fi
+		tput sgr0
+		echo
+	done 3<<<"$(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.yml' | sort)"
+}
+
 cmd_show() {
 	[[ $# -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [quiz-name]"
 
@@ -205,7 +233,7 @@ cmd_grep() {
 		quizfile="${quizfile##*/}"
 		printf "\e[94m%s\e[1m%s\e[0m:\n" "$quizfile_dir" "$quizfile"
 		echo "$grepresults"
-	done < <(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.yml' -print0)
+	done < <(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.yml' -print0 | sort)
 }
 
 cmd_insert() {
@@ -368,10 +396,9 @@ cmd_git() {
 	fi
 }
 
-cmd_extension_or_show() {
+cmd_extension_or_super() {
 	if ! cmd_extension "$@"; then
-		COMMAND="show"
-		cmd_show "$@"
+		cmd_super "$@"
 	fi
 }
 
@@ -402,6 +429,7 @@ COMMAND="$1"
 
 case "$1" in
 	init) shift;			cmd_init "$@" ;;
+	test) shift;			cmd_test "$@" ;;
 	help|--help) shift;		cmd_usage "$@" ;;
 	version|--version) shift;	cmd_version "$@" ;;
 	show|ls|list) shift;		cmd_show "$@" ;;
@@ -413,6 +441,6 @@ case "$1" in
 	rename|mv) shift;		cmd_copy_move "move" "$@" ;;
 	copy|cp) shift;			cmd_copy_move "copy" "$@" ;;
 	git) shift;			cmd_git "$@" ;;
-	*)				cmd_extension_or_show "$@" ;;
+	*)				cmd_extension_or_super "$@" ;;
 esac
 exit 0
