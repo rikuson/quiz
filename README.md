@@ -38,6 +38,33 @@ mkdir: created directory ‘/home/rikuson/.quiz-store’
 Quiz store initialized
 ```
 
+### Start quiz
+
+````bash
+$ quiz
+Q) What is the output of this Rust program?
+
+```rust
+macro_rules! m {
+    ($($s:stmt)*) => {
+        $(
+            { stringify!($s); 1 }
+        )<<*
+    };
+}
+
+fn main() {
+    print!(
+        "{}{}{}",
+        m! { return || true },
+        m! { (return) || true },
+        m! { {return} || true },
+    );
+}
+```
+A) _
+````
+
 ### Add quiz to store
 
 ```bash
@@ -149,7 +176,8 @@ Initialized empty Git repository in /home/rikuson/.quiz-store/.git/
 $ quiz git remote add origin git@github.com:rikuson/quiz-store.git
 
 $ quiz add whoami
-Enter answer for whoami:
+Enter question for whoami: Who am I?
+Enter answer for whoami: rikuson
 1 file changed, 0 insertions(+), 0 deletions(-)
 create mode 100644 whoami.yml
 
@@ -164,8 +192,8 @@ To git@github.com:rikuson/quiz-store.git
 Branch master set up to track remote branch master from origin.
 
 $ quiz add whoareyou
-Enter answer for whoareyou:
-anonymous
+Enter question for whoareyou: Who are you?
+Enter answer for whoareyou: anonymous
 [master b9b6746] Added given quiz for whoareyou to store.
 1 file changed, 0 insertions(+), 0 deletions(-)
 create mode 100644 whoareyou.yml
@@ -209,5 +237,6 @@ compdef _rust-quiz rust-quiz
 - [bash](http://www.gnu.org/software/bash/)
 - [git](http://www.git-scm.com/)
 - [tree >= 1.7.0](http://mama.indstate.edu/users/ice/tree/)
+- [yq](https://github.com/mikefarah/yq)
 - [GNU getopt](http://software.frodo.looijaard.name/getopt/)
 - [GNU sed](https://www.gnu.org/software/sed/)
