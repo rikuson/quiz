@@ -140,8 +140,51 @@ mkdir: created directory \[u2018]/home/rikuson/.quiz-store\[u2019]
 .br
 Quiz store initialized
 .TP
+Start quiz
+.B $ quiz
+.br
+Q) What is the output of this Rust program?
+.br
+.br
+```rust
+.br
+macro_rules! m {
+.br
+    ($($s:stmt)*) => {
+.br
+        $(
+.br
+            { stringify!($s); 1 }
+.br
+        )<<*
+.br
+    };
+.br
+}
+.br
+.br
+fn main() {
+.br
+    print!(
+.br
+        "{}{}{}",
+.br
+        m! { return || true },
+.br
+        m! { (return) || true },
+.br
+        m! { {return} || true },
+.br
+    );
+.br
+}
+.br
+```
+.br
+A) _
+.TP
 List existing quizzes in store
-.B $ quiz 
+.B $ quiz  ls
 .br
 Quiz Store
 .br
@@ -165,9 +208,6 @@ Quiz Store
 .br
     \[u2514]\[u2500]\[u2500] 003-cloud-front
 .br
-
-.br
-Alternatively, "\fBquiz ls\fP".
 .TP
 Find existing quizzes in store that match 002
 .B $ quiz find 002
@@ -191,19 +231,60 @@ Search Terms: 002
 Alternatively, "\fBquiz search 002\fP".
 .TP
 Show existing quiz
-.B $ quiz rust/001-macro-count-statements 
+.B $ quiz show rust/001-macro-count-statements
 .br
-112
+question: |
+.br
+  What is the output of this Rust program?
+.br
+  ```rust
+.br
+  macro_rules! m {
+.br
+      ($($s:stmt)*) => {
+.br
+          $(
+.br
+              { stringify!($s); 1 }
+.br
+          )<<*
+.br
+      };
+.br
+  }
+.br
+.br
+  fn main() {
+.br
+      print!(
+.br
+          "{}{}{}",
+.br
+          m! { return || true },
+.br
+          m! { (return) || true },
+.br
+          m! { {return} || true },
+.br
+      );
+.br
+  }
+.br
+  ```
+.br
+answer: 112
 .TP
 Add quiz to store
-.B $ quiz add rust/001-macro-count-statements 
+.B $ quiz add whoami
 .br
-Enter answer for rust/002-bitand-or-reference: 112
+Enter question for whoami: Who am I?
+.br
+Enter answer for whoami: rikuson
 .TP
 Add multiline quiz to store 
 .B $ quiz add -m rust/001-macro-count-statements
 .br
-Enter quiz of rust/002-bitand-or-reference and press Ctrl+D when finished
+Enter quiz of rust/001-macro-count-statements and press Ctrl+D when finished
 .br
  
 .br
@@ -275,7 +356,9 @@ Initialized empty Git repository in /home/rikuson/.quiz-store/.git/
 
 .B $ quiz add whoami
 .br
-Enter answer for whoami:
+Enter question for whoami: Who am I?
+.br
+Enter answer for whoami: rikuson
 .br
 1 file changed, 0 insertions(+), 0 deletions(-)
 .br
@@ -300,6 +383,8 @@ To git@github.com:rikuson/quiz-store.git
 Branch master set up to track remote branch master from origin. 
 
 .B $ quiz add whoareyou
+.br
+Enter question for whoareyou: Who are you?
 .br
 Enter answer for whoareyou: anonymous
 .br
