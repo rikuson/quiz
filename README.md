@@ -38,10 +38,12 @@ mkdir: created directory ‘/home/rikuson/.quiz-store’
 Quiz store initialized
 ```
 
-### Start quiz
+### Test yourself
+
+`quiz test` (or just `quiz` with no arguments) walks every quiz interactively, comparing your answer to the stored one. Answers are case-insensitive.
 
 ````bash
-$ quiz
+$ quiz test
 Q) What is the output of this Rust program?
 
 ```rust
@@ -64,6 +66,14 @@ fn main() {
 ```
 A) _
 ````
+
+For CI use, `quiz test --non-interactive` reads answers from stdin without color output and exits non-zero if any answer is wrong:
+
+```bash
+$ printf "XOR\n" | quiz test --non-interactive
+```
+
+To restrict the quiz set, write a filter script to `$QUIZ_STORE_DIR/.filters/<name>.bash` that reads quiz file paths on stdin and prints the filtered subset on stdout, then run `quiz test --filter <name>`. A default filter can be set via a `.quizrc` file at the store root containing `QUIZ_FILTER=<name>`.
 
 ### Add quiz to store
 
@@ -111,7 +121,7 @@ Press Enter to edit the answer for rust/001-macro-count-statements in vi...
 ### List existing quizzes in store
 
 ```bash
-$ quiz
+$ quiz ls
 Quiz Store
 ├── rust
 │   ├── 001-macro-count-statements
@@ -124,8 +134,6 @@ Quiz Store
     ├── 002-s3-object
     └── 003-cloud-front
 ```
-
-Alternatively, `quiz ls`.
 
 ### Find existing quizzes in store that match 002
 

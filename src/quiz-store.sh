@@ -125,7 +125,11 @@ cmd_usage() {
 	echo "Usage:"
 	echo "    $PROGRAM init"
 	echo "        Initialize new quiz storage."
-	echo "    $PROGRAM [ls] [subfolder]"
+	echo "    $PROGRAM [test] [--non-interactive,-n] [--filter,-F filter-name]"
+	echo "        Run through quizzes interactively. With --non-interactive,"
+	echo "        suppress colors and exit non-zero on any wrong answer."
+	echo "        With --filter, restrict the set of quizzes via a filter script."
+	echo "    $PROGRAM ls [subfolder]"
 	echo "        List quizzes."
 	echo "    $PROGRAM find quiz-names..."
 	echo "        List quizzes that match quiz-names."
@@ -162,12 +166,47 @@ cmd_init() {
 	mkdir -p -v "$PREFIX"
 }
 
-cmd_super() {
+cmd_test() {
+	local opts non_interactive=0 filter=""
+	opts="$($GETOPT -o nF: -l non-interactive,filter: -n "$PROGRAM" -- "$@")"
+	local err=$?
+	eval set -- "$opts"
+	while true; do case $1 in
+		-n|--non-interactive) non_interactive=1; shift ;;
+		-F|--filter) filter="$2"; shift 2 ;;
+		--) shift; break ;;
+	esac done
+	[[ $err -ne 0 ]] && die "Usage: $PROGRAM $COMMAND [--non-interactive,-n] [--filter,-F filter-name]"
+
 	if ! [[ -e $PREFIX ]]; then
 		die "Error: quiz store is empty. Try \"quiz init\"."
 	fi
+
+	[[ -f "$PREFIX/.quizrc" ]] && source "$PREFIX/.quizrc"
+	[[ -z $filter && -n $QUIZ_FILTER ]] && filter="$QUIZ_FILTER"
+
+	local quizfiles
+	quizfiles="$(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -path '*/.filters' -prune -o -iname '*.yml' -print | sort)"
+
+	if [[ -n $filter ]]; then
+		check_sneaky_paths "$filter"
+		local filter_file=""
+		local dir
+		for dir in "${QUIZ_STORE_FILTERS_DIR:-$PREFIX/.filters}" "$SYSTEM_FILTER_DIR"; do
+			if [[ -n $dir && -f "$dir/$filter.bash" ]]; then
+				filter_file="$dir/$filter.bash"
+				break
+			fi
+		done
+		[[ -z $filter_file ]] && die "Error: filter '$filter' not found."
+		quizfiles="$(echo "$quizfiles" | bash "$filter_file")"
+	fi
+
+	[[ -z $quizfiles ]] && die "Error: there is no matched quiz found."
+
+	local fail=0
 	while read quizfile <&3; do
-		[[ $quizfile == "" ]] && die "Error: there is no matched quiz found."
+		[[ $quizfile == "" ]] && continue
 		grep '^question:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`question\` is missing in $quizfile."
 		grep '^answer:' "$quizfile" > /dev/null || die "Error: invalid quiz schema. \`answer\` is missing in $quizfile."
 		yq -r . "$quizfile" > /dev/null 2>&1 || die "Error: invalid quiz schema."
@@ -177,19 +216,26 @@ cmd_super() {
 		echo "Q) $question" | head -n 1
 		echo "$question" | tail -n +2
 		local input
-		read -r -p "A) " -e input
+		if [[ $non_interactive -eq 1 ]]; then
+			read -r input
+		else
+			read -r -p "A) " -e input
+		fi
 		local expected=$(tr '[a-z]' '[A-Z]' <<< $answer)
 		local actual=$(tr '[a-z]' '[A-Z]' <<< $input)
 		if [[ ${actual} == ${expected} ]]; then
-			tput setaf 2
+			[[ $non_interactive -eq 0 ]] && tput setaf 2
 			echo "OK"
 		else
-			tput setaf 1
-			echo $answer
+			fail=1
+			[[ $non_interactive -eq 0 ]] && tput setaf 1
+			echo "$answer"
 		fi
-		tput sgr0
+		[[ $non_interactive -eq 0 ]] && tput sgr0
 		echo
-	done 3<<<"$(find -L "$PREFIX" -path '*/.git' -prune -o -path '*/.extensions' -prune -o -iname '*.yml' | sort)"
+	done 3<<<"$quizfiles"
+
+	exit $fail
 }
 
 cmd_show() {
@@ -418,13 +464,14 @@ cmd_git() {
 	fi
 }
 
-cmd_extension_or_super() {
+cmd_extension_or_test() {
 	if ! cmd_extension "$@"; then
-		cmd_super "$@"
+		cmd_test "$@"
 	fi
 }
 
 SYSTEM_EXTENSION_DIR=""
+SYSTEM_FILTER_DIR=""
 cmd_extension() {
 	check_sneaky_paths "$1"
 	local user_extension system_extension extension
@@ -463,6 +510,6 @@ case "$1" in
 	rename|mv) shift;		cmd_copy_move "move" "$@" ;;
 	copy|cp) shift;			cmd_copy_move "copy" "$@" ;;
 	git) shift;			cmd_git "$@" ;;
-	*)				cmd_extension_or_super "$@" ;;
+	*)				cmd_extension_or_test "$@" ;;
 esac
 exit 0
