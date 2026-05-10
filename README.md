@@ -3,6 +3,8 @@
 Once you learn new things, you'll never forget anymore.  
 `quiz` helps you reviewing what you've learned.
 
+This is forked from [pass](https://www.passwordstore.org) which is a simple password manager following Unix philosophy.
+
 ## Installation
 
 ### Linux
@@ -204,8 +206,3 @@ compdef _rust-quiz rust-quiz
 - [tree >= 1.7.0](http://mama.indstate.edu/users/ice/tree/)
 - [GNU getopt](http://software.frodo.looijaard.name/getopt/)
 - [GNU sed](https://www.gnu.org/software/sed/)
-
-## Special Thanks
-
-This is forked from [pass](https://www.passwordstore.org) which is simple password manager following Unix philosophy.  
-Respect Jason Donenfeld and contributors.
