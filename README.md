@@ -38,47 +38,6 @@ mkdir: created directory ‘/home/rikuson/.quiz-store’
 Quiz store initialized
 ```
 
-### List existing quizzes in store
-
-```bash
-$ quiz
-Quiz Store
-├── rust
-│   ├── 001-macro-count-statements
-│   └── 002-bitand-or-reference
-├── deep-learning
-│   ├── 001-logical-gate
-│   └── 002-segmentation
-└── aws-certification
-    ├── 001-auto-scaling
-    ├── 002-s3-object
-    └── 003-cloud-front
-```
-
-Alternatively, "quiz ls".
-
-### Find existing quizzes in store that match 002
-
-```bash
-$ quiz find 002
-Search Terms: 002
-├── rust
-│   └── 002-bitand-or-reference
-├── deep-learning
-│   └── 002-segmentation
-└── aws-certification
-    ├── 002-s3-object
-```
-
-Alternatively, "quiz search 002".
-
-### Show existing quiz
-
-```bash
-$ quiz rust/001-macro-count-statements
-112
-```
-
 ### Add quiz to store
 
 ```bash
@@ -86,7 +45,7 @@ $ quiz add rust/001-macro-count-statements
 Enter answer for rust/002-bitand-or-reference: 112
 ```
 
-Alternatively, "quiz insert rust/001-macro-count-statements".
+Alternatively, `quiz insert rust/001-macro-count-statements`.
 
 ### Add multiline quiz to store
 
@@ -115,8 +74,48 @@ fn main() {
     );
 }
 ```
-^D
 ````
+
+### List existing quizzes in store
+
+```bash
+$ quiz
+Quiz Store
+├── rust
+│   ├── 001-macro-count-statements
+│   └── 002-bitand-or-reference
+├── deep-learning
+│   ├── 001-logical-gate
+│   └── 002-segmentation
+└── aws-certification
+    ├── 001-auto-scaling
+    ├── 002-s3-object
+    └── 003-cloud-front
+```
+
+Alternatively, `quiz ls`.
+
+### Find existing quizzes in store that match 002
+
+```bash
+$ quiz find 002
+Search Terms: 002
+├── rust
+│   └── 002-bitand-or-reference
+├── deep-learning
+│   └── 002-segmentation
+└── aws-certification
+    ├── 002-s3-object
+```
+
+Alternatively, `quiz search 002`.
+
+### Show existing quiz
+
+```bash
+$ quiz rust/001-macro-count-statements
+112
+```
 
 ### Remove quiz from store
 
