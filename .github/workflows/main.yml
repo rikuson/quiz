@@ -32,6 +32,6 @@ jobs:
       - name: Run a install script
         run: PREFIX=$(brew --prefix) make install
       - name: Prepare dependencies
-        run: brew install tree gnu-sed
+        run: brew install tree gnu-sed gnu-getopt
       - name: Run a test script
         run: make test
