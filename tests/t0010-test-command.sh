@@ -113,21 +113,21 @@ test_expect_success 'Empty quiz store fails' '
 test_expect_success 'Missing question fails' '
 	rm -rf "$QUIZ_STORE_DIR" &&
 	"$QUIZ" init &&
-	printf "answer: fakeanswer" | "$QUIZ" add -m quiz1 &&
+	printf "answer: fakeanswer\n" > "$QUIZ_STORE_DIR/quiz1.yml" &&
 	test_must_fail "$QUIZ" test
 '
 
 test_expect_success 'Missing answer fails' '
 	rm -rf "$QUIZ_STORE_DIR" &&
 	"$QUIZ" init &&
-	printf "question: fakequestion" | "$QUIZ" add -m quiz1 &&
+	printf "question: fakequestion\n" > "$QUIZ_STORE_DIR/quiz1.yml" &&
 	test_must_fail "$QUIZ" test
 '
 
 test_expect_success 'Invalid YAML schema fails' '
 	rm -rf "$QUIZ_STORE_DIR" &&
 	"$QUIZ" init &&
-	printf "question: fakequestion\nanswer: fakeanswer:" | "$QUIZ" add -m quiz1 &&
+	printf "question: fakequestion\nanswer: fakeanswer:\n" > "$QUIZ_STORE_DIR/quiz1.yml" &&
 	test_must_fail "$QUIZ" test
 '
 
