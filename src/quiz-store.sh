@@ -215,14 +215,23 @@ cmd_test() {
 		local answer=$(yq -r .answer "$quizfile")
 		echo "Q) $question" | head -n 1
 		echo "$question" | tail -n +2
-		local input
-		if [[ $non_interactive -eq 1 ]]; then
-			read -r input
-		else
-			read -r -p "A) " -e input
-		fi
-		local expected=$(tr '[a-z]' '[A-Z]' <<< $answer)
-		local actual=$(tr '[a-z]' '[A-Z]' <<< $input)
+		local input="" line prompt="A) "
+		while true; do
+			if [[ $non_interactive -eq 1 ]]; then
+				read -r line || break
+			else
+				read -r -p "$prompt" -e line
+			fi
+			if [[ $line == *\\ ]]; then
+				input+="${line%\\}"$'\n'
+				prompt="   "
+			else
+				input+="$line"
+				break
+			fi
+		done
+		local expected=$(tr '[a-z]' '[A-Z]' <<< "$answer")
+		local actual=$(tr '[a-z]' '[A-Z]' <<< "$input")
 		if [[ ${actual} == ${expected} ]]; then
 			[[ $non_interactive -eq 0 ]] && tput setaf 2
 			echo "OK"

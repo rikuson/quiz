@@ -57,7 +57,9 @@ Initialize new quiz storage.
 .TP
 \fBtest\fP [ \fI--non-interactive\fP, \fI-n\fP ] [ \fI--filter\fP, \fI-F\fP \fIfilter-name\fP ]
 Walk every quiz in the store, prompting for an answer and comparing it to the
-stored one (case-insensitive). If \fI--non-interactive\fP is specified, ANSI
+stored one (case-insensitive). End a line with a backslash (\fI\\\fP) to continue
+the answer on the next line, for quizzes whose stored answer spans multiple
+lines. If \fI--non-interactive\fP is specified, ANSI
 color output is suppressed and the command exits non-zero if any answer is
 wrong, suitable for CI use. If \fI--filter\fP is specified, the set of quizzes
 is restricted by running the script at \fI$QUIZ_STORE_DIR/.filters/<name>.bash\fP,

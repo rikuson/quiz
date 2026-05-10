@@ -64,6 +64,20 @@ test_expect_success '--non-interactive emits no ANSI color codes' '
 	! printf "%s" "$out" | grep -q $"\x1B"
 '
 
+test_expect_success 'Multi-line answer with backslash continuation' '
+	rm -rf "$QUIZ_STORE_DIR" &&
+	"$QUIZ" init &&
+	printf "question: q1\nanswer: |\n  hello\n  world\n" > "$QUIZ_STORE_DIR/multi.yml" &&
+	printf "hello\\\\\nworld\n" | "$QUIZ" test --non-interactive
+'
+
+test_expect_success 'Multi-line answer without continuation fails' '
+	rm -rf "$QUIZ_STORE_DIR" &&
+	"$QUIZ" init &&
+	printf "question: q1\nanswer: |\n  hello\n  world\n" > "$QUIZ_STORE_DIR/multi.yml" &&
+	test_must_fail bash -c "printf \"hello world\n\" | \"$QUIZ\" test --non-interactive"
+'
+
 test_expect_success '-n short flag works' '
 	rm -rf "$QUIZ_STORE_DIR" &&
 	"$QUIZ" init &&

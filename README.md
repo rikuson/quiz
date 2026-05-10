@@ -40,7 +40,7 @@ Quiz store initialized
 
 ### Test yourself
 
-`quiz test` (or just `quiz` with no arguments) walks every quiz interactively, comparing your answer to the stored one. Answers are case-insensitive.
+`quiz test` (or just `quiz` with no arguments) walks every quiz interactively, comparing your answer to the stored one. Answers are case-insensitive. End a line with `\` to continue the answer on the next line — useful for quizzes whose stored answer spans multiple lines.
 
 ````bash
 $ quiz test
