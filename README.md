@@ -3,6 +3,29 @@
 Once you learn new things, you'll never forget anymore.  
 `quiz` helps you reviewing what you've learned.
 
+## Installation
+
+### Linux
+
+```bash
+git clone https://github.com/rikuson/quiz.git
+cd quiz
+sudo make install
+```
+
+### macOS
+
+`quiz` depends on GNU versions of `sed` and `getopt`, plus `tree`, on macOS:
+
+```bash
+brew install tree gnu-sed gnu-getopt
+git clone https://github.com/rikuson/quiz.git
+cd quiz
+PREFIX=$(brew --prefix) make install
+```
+
+See [INSTALL](INSTALL) for `PREFIX`, completion paths, and other options.
+
 ## Simple Examples
 
 ### Initialize quiz store
