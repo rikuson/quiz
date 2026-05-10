@@ -86,10 +86,11 @@ prompts for question and answer on standard input. If \fI--multiline\fP or \fI-m
 is specified, the default text editor specified by the environment variable \fIEDITOR\fP
 or
 .BR vi (1)
-as a fallback is opened on a temporary file prefilled with a \fIquestion: |\fP /
-\fIanswer: |\fP YAML template, allowing multi-line entry. Prompt before overwriting an
-existing quiz, unless \fI--force\fP or \fI-f\fP is specified. This command is
-alternatively named \fBinsert\fP.
+as a fallback is opened twice — first on an empty buffer for the question body,
+then on an empty buffer for the answer body — and the two buffers are assembled
+into a YAML file with \fIquestion: |\fP and \fIanswer: |\fP block scalars. Prompt
+before overwriting an existing quiz, unless \fI--force\fP or \fI-f\fP is specified.
+This command is alternatively named \fBinsert\fP.
 .TP
 \fBedit\fP \fIquiz-name\fP
 Insert a new quiz or edit an existing quiz using the default text editor specified

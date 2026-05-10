@@ -10,8 +10,8 @@ test_expect_success 'Basic move command' '
 	"$QUIZ" init &&
 	"$QUIZ" git init &&
 	export PATH="$TEST_HOME:$PATH" &&
-	export EDITOR="fake-editor-change-answer.sh" &&
-	export FAKE_EDITOR_ANSWER="$INITIAL_QUIZ" &&
+	export EDITOR="fake-editor-write.sh" &&
+	export FAKE_EDITOR_CONTENT="$INITIAL_QUIZ" &&
 	"$QUIZ" add -m cred1 &&
 	"$QUIZ" mv cred1 cred2 &&
 	[[ -e $QUIZ_STORE_DIR/cred2.yml && ! -e $QUIZ_STORE_DIR/cred1.yml ]]
@@ -44,7 +44,7 @@ test_expect_success 'Multi-directory creation and multi-directory empty removal'
 '
 
 test_expect_success 'Password made it until the end' '
-	[[ $("$QUIZ" show cred | head -1) == "$INITIAL_QUIZ" ]]
+	[[ "$("$QUIZ" show cred)" == *"$INITIAL_QUIZ"* ]]
 '
 
 test_expect_success 'Git is consistent' '

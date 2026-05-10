@@ -134,9 +134,10 @@ cmd_usage() {
 	echo "    $PROGRAM grep [GREPOPTIONS] search-string"
 	echo "        Search for quiz files containing search-string when decrypted."
 	echo "    $PROGRAM insert [--multiline,-m] [--force,-f] quiz-name"
-	echo "        Insert new quiz. With --multiline, open ${EDITOR:-vi} prefilled with a"
-	echo "        question:/answer: YAML template for multi-line entry. Prompt before"
-	echo "        overwriting existing quiz unless forced."
+	echo "        Insert new quiz. With --multiline, open ${EDITOR:-vi} twice — first for"
+	echo "        the question body, then for the answer body — and assemble them into a"
+	echo "        question:/answer: YAML file. Prompt before overwriting existing quiz"
+	echo "        unless forced."
 	echo "    $PROGRAM edit quiz-name"
 	echo "        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}."
 	echo "    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name"
@@ -231,11 +232,26 @@ cmd_insert() {
 
 	if [[ $multiline -eq 1 ]]; then
 		tmpdir #Defines $SECURE_TMPDIR
-		local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}.yml"
-		printf 'question: |\nanswer: |\n' > "$tmp_file"
-		${EDITOR:-vi} "$tmp_file"
-		[[ -f $tmp_file ]] || die "New quiz not saved."
-		mv "$tmp_file" "$quizfile" || exit 1
+		local tmp_prefix="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}"
+		local q_file="$tmp_prefix.question.txt"
+		local a_file="$tmp_prefix.answer.txt"
+		: > "$q_file"
+		: > "$a_file"
+
+		echo "Edit the question for $path, then save and close the editor."
+		${EDITOR:-vi} "$q_file"
+		[[ -f $q_file ]] || die "New quiz not saved."
+
+		echo "Edit the answer for $path, then save and close the editor."
+		${EDITOR:-vi} "$a_file"
+		[[ -f $a_file ]] || die "New quiz not saved."
+
+		{
+			echo "question: |"
+			awk '{print "  " $0}' "$q_file"
+			echo "answer: |"
+			awk '{print "  " $0}' "$a_file"
+		} > "$quizfile" || exit 1
 	else
 		local quiz question answer
 		read -r -p "Enter question for $path: " -e question

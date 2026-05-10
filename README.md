@@ -50,34 +50,35 @@ Alternatively, `quiz insert deep-learning/001-logical-gate`.
 
 ### Add multiline quiz to store
 
-`quiz add -m` opens `$EDITOR` (default `vi`) on a temporary file prefilled with a `question: |` / `answer: |` YAML template, so you can write multi-line questions and answers.
+`quiz add -m` opens `$EDITOR` (default `vi`) twice — first on an empty buffer for the question body, then on an empty buffer for the answer body. The two buffers are assembled into a YAML file with `question: |` and `answer: |` block scalars, so you can author multi-line questions and answers without writing YAML by hand.
 
 ````bash
 $ quiz add -m rust/001-macro-count-statements
-# $EDITOR opens with the following prefilled, edit and save:
-question: |
-  What is the output of this Rust program?
+Edit the question for rust/001-macro-count-statements, then save and close the editor.
+# $EDITOR opens — type the question body and save:
+What is the output of this Rust program?
 
-  ```rust
-  macro_rules! m {
-      ($($s:stmt)*) => {
-          $(
-              { stringify!($s); 1 }
-          )<<*
-      };
-  }
+```rust
+macro_rules! m {
+    ($($s:stmt)*) => {
+        $(
+            { stringify!($s); 1 }
+        )<<*
+    };
+}
 
-  fn main() {
-      print!(
-          "{}{}{}",
-          m! { return || true },
-          m! { (return) || true },
-          m! { {return} || true },
-      );
-  }
-  ```
-answer: |
-  112
+fn main() {
+    print!(
+        "{}{}{}",
+        m! { return || true },
+        m! { (return) || true },
+        m! { {return} || true },
+    );
+}
+```
+Edit the answer for rust/001-macro-count-statements, then save and close the editor.
+# $EDITOR reopens — type the answer body and save:
+112
 ````
 
 ### List existing quizzes in store

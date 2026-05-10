@@ -12,10 +12,10 @@ test_expect_success 'Test "show" command' '
 
 test_expect_success 'Test "show" command with spaces' '
 	export PATH="$TEST_HOME:$PATH" &&
-	export EDITOR="fake-editor-change-answer.sh" &&
-	export FAKE_EDITOR_ANSWER="BLAH!!" &&
+	export EDITOR="fake-editor-write.sh" &&
+	export FAKE_EDITOR_CONTENT="BLAH!!" &&
 	"$QUIZ" add -m "I am a cred with lots of spaces" &&
-	[[ $("$QUIZ" show "I am a cred with lots of spaces" | head -1) == "BLAH!!" ]]
+	[[ "$("$QUIZ" show "I am a cred with lots of spaces")" == *"BLAH!!"* ]]
 '
 
 test_expect_success 'Test "show" command with unicode' '
