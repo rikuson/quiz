@@ -50,11 +50,12 @@ Alternatively, `quiz insert deep-learning/001-logical-gate`.
 
 ### Add multiline quiz to store
 
+`quiz add -m` opens `$EDITOR` (default `vi`) twice — first on an empty buffer for the question body, then on an empty buffer for the answer body. The two buffers are assembled into a YAML file with `question: |` and `answer: |` block scalars, so you can author multi-line questions and answers without writing YAML by hand.
+
 ````bash
 $ quiz add -m rust/001-macro-count-statements
-Enter quiz of rust/002-bitand-or-reference and press Ctrl+D when finished
-
-112
+Press Enter to edit the question for rust/001-macro-count-statements in vi...
+# press Enter; $EDITOR opens — type the question body and save:
 What is the output of this Rust program?
 
 ```rust
@@ -75,6 +76,9 @@ fn main() {
     );
 }
 ```
+Press Enter to edit the answer for rust/001-macro-count-statements in vi...
+# press Enter; $EDITOR reopens — type the answer body and save:
+112
 ````
 
 ### List existing quizzes in store

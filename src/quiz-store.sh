@@ -134,9 +134,10 @@ cmd_usage() {
 	echo "    $PROGRAM grep [GREPOPTIONS] search-string"
 	echo "        Search for quiz files containing search-string when decrypted."
 	echo "    $PROGRAM insert [--multiline,-m] [--force,-f] quiz-name"
-	echo "        Insert new quiz. Optionally, echo the quiz back to the console"
-	echo "        during entry. Or, optionally, the entry may be multiline. Prompt before"
-	echo "        overwriting existing quiz unless forced."
+	echo "        Insert new quiz. With --multiline, open ${EDITOR:-vi} twice — first for"
+	echo "        the question body, then for the answer body — and assemble them into a"
+	echo "        question:/answer: YAML file. Prompt before overwriting existing quiz"
+	echo "        unless forced."
 	echo "    $PROGRAM edit quiz-name"
 	echo "        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}."
 	echo "    $PROGRAM rm [--recursive,-r] [--force,-f] quiz-name"
@@ -230,10 +231,29 @@ cmd_insert() {
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
 
 	if [[ $multiline -eq 1 ]]; then
-		echo "Enter quiz of $path and press Ctrl+D when finished:"
-		echo
-		local quiz=$(cat)
-		echo "$quiz" > "$quizfile" || exit 1
+		tmpdir #Defines $SECURE_TMPDIR
+		local tmp_prefix="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}"
+		local q_file="$tmp_prefix.question.txt"
+		local a_file="$tmp_prefix.answer.txt"
+		: > "$q_file"
+		: > "$a_file"
+
+		echo "Press Enter to edit the question for $path in ${EDITOR:-vi}..."
+		read -r
+		${EDITOR:-vi} "$q_file"
+		[[ -f $q_file ]] || die "New quiz not saved."
+
+		echo "Press Enter to edit the answer for $path in ${EDITOR:-vi}..."
+		read -r
+		${EDITOR:-vi} "$a_file"
+		[[ -f $a_file ]] || die "New quiz not saved."
+
+		{
+			echo "question: |"
+			awk '{print "  " $0}' "$q_file"
+			echo "answer: |"
+			awk '{print "  " $0}' "$a_file"
+		} > "$quizfile" || exit 1
 	else
 		local quiz question answer
 		read -r -p "Enter question for $path: " -e question
