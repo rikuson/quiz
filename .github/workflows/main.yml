@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [master]
   pull_request:
     branches: [master]
   workflow_dispatch:
@@ -14,13 +15,10 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
       - run: npx editorconfig-checker
   ubuntu:
-    strategy:
-      matrix:
-        os: [ubuntu-22.04, ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Run a install script
@@ -28,15 +26,12 @@ jobs:
       - name: Run a test script
         run: make test
   macos:
-    strategy:
-      matrix:
-        os: [macos-12, macos-11]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
       - name: Run a install script
         run: PREFIX=$(brew --prefix) make install
       - name: Prepare dependencies
-        run: brew install tree gnu-sed
+        run: brew install tree gnu-sed gnu-getopt
       - name: Run a test script
         run: make test
