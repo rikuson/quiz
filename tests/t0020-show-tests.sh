@@ -14,7 +14,7 @@ test_expect_success 'Test "show" command with spaces' '
 	export PATH="$TEST_HOME:$PATH" &&
 	export EDITOR="fake-editor-write.sh" &&
 	export FAKE_EDITOR_CONTENT="BLAH!!" &&
-	"$QUIZ" add -m "I am a cred with lots of spaces" &&
+	printf "\n\n" | "$QUIZ" add -m "I am a cred with lots of spaces" &&
 	[[ "$("$QUIZ" show "I am a cred with lots of spaces")" == *"BLAH!!"* ]]
 '
 

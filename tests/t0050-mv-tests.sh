@@ -12,7 +12,7 @@ test_expect_success 'Basic move command' '
 	export PATH="$TEST_HOME:$PATH" &&
 	export EDITOR="fake-editor-write.sh" &&
 	export FAKE_EDITOR_CONTENT="$INITIAL_QUIZ" &&
-	"$QUIZ" add -m cred1 &&
+	printf "\n\n" | "$QUIZ" add -m cred1 &&
 	"$QUIZ" mv cred1 cred2 &&
 	[[ -e $QUIZ_STORE_DIR/cred2.yml && ! -e $QUIZ_STORE_DIR/cred1.yml ]]
 '

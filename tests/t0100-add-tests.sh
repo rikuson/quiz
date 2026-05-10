@@ -10,7 +10,7 @@ test_expect_success 'Test "add -m" assembles YAML from question and answer edito
 	export EDITOR="fake-editor-write.sh" &&
 	export FAKE_EDITOR_Q="my question" &&
 	export FAKE_EDITOR_A="my answer" &&
-	"$QUIZ" add -m cred1 &&
+	printf "\n\n" | "$QUIZ" add -m cred1 &&
 	output="$("$QUIZ" show cred1)" &&
 	[[ "$output" == *"question: |"*"  my question"* ]] &&
 	[[ "$output" == *"answer: |"*"  my answer"* ]]

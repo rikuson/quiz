@@ -238,11 +238,13 @@ cmd_insert() {
 		: > "$q_file"
 		: > "$a_file"
 
-		echo "Edit the question for $path, then save and close the editor."
+		echo "Press Enter to edit the question for $path in ${EDITOR:-vi}..."
+		read -r
 		${EDITOR:-vi} "$q_file"
 		[[ -f $q_file ]] || die "New quiz not saved."
 
-		echo "Edit the answer for $path, then save and close the editor."
+		echo "Press Enter to edit the answer for $path in ${EDITOR:-vi}..."
+		read -r
 		${EDITOR:-vi} "$a_file"
 		[[ -f $a_file ]] || die "New quiz not saved."
 

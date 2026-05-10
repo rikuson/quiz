@@ -54,8 +54,8 @@ Alternatively, `quiz insert deep-learning/001-logical-gate`.
 
 ````bash
 $ quiz add -m rust/001-macro-count-statements
-Edit the question for rust/001-macro-count-statements, then save and close the editor.
-# $EDITOR opens — type the question body and save:
+Press Enter to edit the question for rust/001-macro-count-statements in vi...
+# press Enter; $EDITOR opens — type the question body and save:
 What is the output of this Rust program?
 
 ```rust
@@ -76,8 +76,8 @@ fn main() {
     );
 }
 ```
-Edit the answer for rust/001-macro-count-statements, then save and close the editor.
-# $EDITOR reopens — type the answer body and save:
+Press Enter to edit the answer for rust/001-macro-count-statements in vi...
+# press Enter; $EDITOR reopens — type the answer body and save:
 112
 ````
 
