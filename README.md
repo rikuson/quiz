@@ -41,11 +41,12 @@ Quiz store initialized
 ### Add quiz to store
 
 ```bash
-$ quiz add rust/001-macro-count-statements
-Enter answer for rust/002-bitand-or-reference: 112
+$ quiz add deep-learning/001-logical-gate
+Enter question for deep-learning/001-logical-gate: Which logic gate cannot be expressed by a single-layer perceptron?
+Enter answer for deep-learning/001-logical-gate: XOR
 ```
 
-Alternatively, `quiz insert rust/001-macro-count-statements`.
+Alternatively, `quiz insert deep-learning/001-logical-gate`.
 
 ### Add multiline quiz to store
 
@@ -114,7 +115,8 @@ Alternatively, `quiz search 002`.
 
 ```bash
 $ quiz rust/001-macro-count-statements
-112
+question: How many statements does the macro count?
+answer: 112
 ```
 
 ### Remove quiz from store
