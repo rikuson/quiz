@@ -134,8 +134,8 @@ cmd_usage() {
 	echo "    $PROGRAM grep [GREPOPTIONS] search-string"
 	echo "        Search for quiz files containing search-string when decrypted."
 	echo "    $PROGRAM insert [--multiline,-m] [--force,-f] quiz-name"
-	echo "        Insert new quiz. Optionally, echo the quiz back to the console"
-	echo "        during entry. Or, optionally, the entry may be multiline. Prompt before"
+	echo "        Insert new quiz. With --multiline, open ${EDITOR:-vi} prefilled with a"
+	echo "        question:/answer: YAML template for multi-line entry. Prompt before"
 	echo "        overwriting existing quiz unless forced."
 	echo "    $PROGRAM edit quiz-name"
 	echo "        Insert a new quiz or edit an existing quiz using ${EDITOR:-vi}."
@@ -230,10 +230,12 @@ cmd_insert() {
 	mkdir -p -v "$PREFIX/$(dirname -- "$path")"
 
 	if [[ $multiline -eq 1 ]]; then
-		echo "Enter quiz of $path and press Ctrl+D when finished:"
-		echo
-		local quiz=$(cat)
-		echo "$quiz" > "$quizfile" || exit 1
+		tmpdir #Defines $SECURE_TMPDIR
+		local tmp_file="$(mktemp -u "$SECURE_TMPDIR/XXXXXX")-${path//\//-}.yml"
+		printf 'question: |\nanswer: |\n' > "$tmp_file"
+		${EDITOR:-vi} "$tmp_file"
+		[[ -f $tmp_file ]] || die "New quiz not saved."
+		mv "$tmp_file" "$quizfile" || exit 1
 	else
 		local quiz question answer
 		read -r -p "Enter question for $path: " -e question
