@@ -23,11 +23,9 @@ utility provides a series of commands for manipulating the quiz store,
 allowing the user to add, remove, edit, synchronize, and manipulate
 quizzes.
 
-If no COMMAND is specified, COMMAND defaults to either
-.B show
-or
-.BR ls ,
-depending on the type of specifier in ARGS. Alternatively, if \fIQUIZ_STORE_ENABLE_EXTENSIONS\fP
+If no COMMAND is specified, COMMAND defaults to
+.BR test ,
+walking each quiz interactively. Alternatively, if \fIQUIZ_STORE_ENABLE_EXTENSIONS\fP
 is set to "true", and the file \fI.extensions/COMMAND.bash\fP exists inside the
 quiz store and is executable, then it is sourced into the environment,
 passing any arguments and environment variables. Extensions existing in a
@@ -56,6 +54,21 @@ quiz names in
 .TP
 \fBinit\fP
 Initialize new quiz storage.
+.TP
+\fBtest\fP [ \fI--non-interactive\fP, \fI-n\fP ] [ \fI--filter\fP, \fI-F\fP \fIfilter-name\fP ]
+Walk every quiz in the store, prompting for an answer and comparing it to the
+stored one (case-insensitive). End a line with a backslash (\fI\\\fP) to continue
+the answer on the next line, for quizzes whose stored answer spans multiple
+lines. To enter a literal trailing backslash, double it (\fI\\\\\fP): \fI2n\fP
+trailing backslashes become \fIn\fP literal backslashes, and \fI2n+1\fP become
+\fIn\fP literal backslashes plus a line continuation. If \fI--non-interactive\fP
+is specified, ANSI
+color output is suppressed and the command exits non-zero if any answer is
+wrong, suitable for CI use. If \fI--filter\fP is specified, the set of quizzes
+is restricted by running the script at \fI$QUIZ_STORE_DIR/.filters/<name>.bash\fP,
+which receives quiz file paths on stdin and emits the filtered subset on stdout.
+A default filter can be set in \fI$QUIZ_STORE_DIR/.quizrc\fP via
+\fIQUIZ_FILTER=<name>\fP. If no \fICOMMAND\fP is given, this is the default.
 .TP
 \fBls\fP \fIsubfolder\fP
 List names of quizzes inside the tree at
@@ -147,8 +160,51 @@ mkdir: created directory \[u2018]/home/rikuson/.quiz-store\[u2019]
 .br
 Quiz store initialized
 .TP
+Start quiz
+.B $ quiz
+.br
+Q) What is the output of this Rust program?
+.br
+.br
+```rust
+.br
+macro_rules! m {
+.br
+    ($($s:stmt)*) => {
+.br
+        $(
+.br
+            { stringify!($s); 1 }
+.br
+        )<<*
+.br
+    };
+.br
+}
+.br
+.br
+fn main() {
+.br
+    print!(
+.br
+        "{}{}{}",
+.br
+        m! { return || true },
+.br
+        m! { (return) || true },
+.br
+        m! { {return} || true },
+.br
+    );
+.br
+}
+.br
+```
+.br
+A) _
+.TP
 List existing quizzes in store
-.B $ quiz 
+.B $ quiz  ls
 .br
 Quiz Store
 .br
@@ -172,9 +228,6 @@ Quiz Store
 .br
     \[u2514]\[u2500]\[u2500] 003-cloud-front
 .br
-
-.br
-Alternatively, "\fBquiz ls\fP".
 .TP
 Find existing quizzes in store that match 002
 .B $ quiz find 002
@@ -198,19 +251,60 @@ Search Terms: 002
 Alternatively, "\fBquiz search 002\fP".
 .TP
 Show existing quiz
-.B $ quiz rust/001-macro-count-statements 
+.B $ quiz show rust/001-macro-count-statements
 .br
-112
+question: |
+.br
+  What is the output of this Rust program?
+.br
+  ```rust
+.br
+  macro_rules! m {
+.br
+      ($($s:stmt)*) => {
+.br
+          $(
+.br
+              { stringify!($s); 1 }
+.br
+          )<<*
+.br
+      };
+.br
+  }
+.br
+.br
+  fn main() {
+.br
+      print!(
+.br
+          "{}{}{}",
+.br
+          m! { return || true },
+.br
+          m! { (return) || true },
+.br
+          m! { {return} || true },
+.br
+      );
+.br
+  }
+.br
+  ```
+.br
+answer: 112
 .TP
 Add quiz to store
-.B $ quiz add rust/001-macro-count-statements 
+.B $ quiz add whoami
 .br
-Enter answer for rust/002-bitand-or-reference: 112
+Enter question for whoami: Who am I?
+.br
+Enter answer for whoami: rikuson
 .TP
 Add multiline quiz to store 
 .B $ quiz add -m rust/001-macro-count-statements
 .br
-Enter quiz of rust/002-bitand-or-reference and press Ctrl+D when finished
+Enter quiz of rust/001-macro-count-statements and press Ctrl+D when finished
 .br
  
 .br
@@ -282,7 +376,9 @@ Initialized empty Git repository in /home/rikuson/.quiz-store/.git/
 
 .B $ quiz add whoami
 .br
-Enter answer for whoami:
+Enter question for whoami: Who am I?
+.br
+Enter answer for whoami: rikuson
 .br
 1 file changed, 0 insertions(+), 0 deletions(-)
 .br
@@ -307,6 +403,8 @@ To git@github.com:rikuson/quiz-store.git
 Branch master set up to track remote branch master from origin. 
 
 .B $ quiz add whoareyou
+.br
+Enter question for whoareyou: Who are you?
 .br
 Enter answer for whoareyou: anonymous
 .br

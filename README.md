@@ -38,6 +38,43 @@ mkdir: created directory ‘/home/rikuson/.quiz-store’
 Quiz store initialized
 ```
 
+### Test yourself
+
+`quiz test` (or just `quiz` with no arguments) walks every quiz interactively, comparing your answer to the stored one. Answers are case-insensitive. End a line with `\` to continue the answer on the next line — useful for quizzes whose stored answer spans multiple lines. To enter a literal trailing backslash, double it (`\\`); generally, `2n` trailing backslashes are treated as `n` literal backslashes and `2n+1` are `n` literal backslashes plus a line continuation.
+
+````bash
+$ quiz test
+Q) What is the output of this Rust program?
+
+```rust
+macro_rules! m {
+    ($($s:stmt)*) => {
+        $(
+            { stringify!($s); 1 }
+        )<<*
+    };
+}
+
+fn main() {
+    print!(
+        "{}{}{}",
+        m! { return || true },
+        m! { (return) || true },
+        m! { {return} || true },
+    );
+}
+```
+A) _
+````
+
+For CI use, `quiz test --non-interactive` reads answers from stdin without color output and exits non-zero if any answer is wrong:
+
+```bash
+$ printf "XOR\n" | quiz test --non-interactive
+```
+
+To restrict the quiz set, write a filter script to `$QUIZ_STORE_DIR/.filters/<name>.bash` that reads quiz file paths on stdin and prints the filtered subset on stdout, then run `quiz test --filter <name>`. A default filter can be set via a `.quizrc` file at the store root containing `QUIZ_FILTER=<name>`.
+
 ### Add quiz to store
 
 ```bash
@@ -84,7 +121,7 @@ Press Enter to edit the answer for rust/001-macro-count-statements in vi...
 ### List existing quizzes in store
 
 ```bash
-$ quiz
+$ quiz ls
 Quiz Store
 ├── rust
 │   ├── 001-macro-count-statements
@@ -97,8 +134,6 @@ Quiz Store
     ├── 002-s3-object
     └── 003-cloud-front
 ```
-
-Alternatively, `quiz ls`.
 
 ### Find existing quizzes in store that match 002
 
@@ -149,7 +184,8 @@ Initialized empty Git repository in /home/rikuson/.quiz-store/.git/
 $ quiz git remote add origin git@github.com:rikuson/quiz-store.git
 
 $ quiz add whoami
-Enter answer for whoami:
+Enter question for whoami: Who am I?
+Enter answer for whoami: rikuson
 1 file changed, 0 insertions(+), 0 deletions(-)
 create mode 100644 whoami.yml
 
@@ -164,8 +200,8 @@ To git@github.com:rikuson/quiz-store.git
 Branch master set up to track remote branch master from origin.
 
 $ quiz add whoareyou
-Enter answer for whoareyou:
-anonymous
+Enter question for whoareyou: Who are you?
+Enter answer for whoareyou: anonymous
 [master b9b6746] Added given quiz for whoareyou to store.
 1 file changed, 0 insertions(+), 0 deletions(-)
 create mode 100644 whoareyou.yml
@@ -209,5 +245,6 @@ compdef _rust-quiz rust-quiz
 - [bash](http://www.gnu.org/software/bash/)
 - [git](http://www.git-scm.com/)
 - [tree >= 1.7.0](http://mama.indstate.edu/users/ice/tree/)
+- [yq](https://github.com/mikefarah/yq)
 - [GNU getopt](http://software.frodo.looijaard.name/getopt/)
 - [GNU sed](https://www.gnu.org/software/sed/)
