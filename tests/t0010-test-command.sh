@@ -78,6 +78,20 @@ test_expect_success 'Multi-line answer without continuation fails' '
 	test_must_fail bash -c "printf \"hello world\n\" | \"$QUIZ\" test --non-interactive"
 '
 
+test_expect_success 'Trailing backslash in answer escaped by doubling' '
+	rm -rf "$QUIZ_STORE_DIR" &&
+	"$QUIZ" init &&
+	printf "question: q1\nanswer: '\''foo\\\\'\''\n" > "$QUIZ_STORE_DIR/back.yml" &&
+	printf "foo\\\\\\\\\n" | "$QUIZ" test --non-interactive
+'
+
+test_expect_success 'Answer with literal backslash on one of several lines' '
+	rm -rf "$QUIZ_STORE_DIR" &&
+	"$QUIZ" init &&
+	printf "question: q1\nanswer: |\n  foo\\\\\n  bar\n" > "$QUIZ_STORE_DIR/multi.yml" &&
+	printf "foo\\\\\\\\\\\\\nbar\n" | "$QUIZ" test --non-interactive
+'
+
 test_expect_success '-n short flag works' '
 	rm -rf "$QUIZ_STORE_DIR" &&
 	"$QUIZ" init &&

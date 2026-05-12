@@ -222,8 +222,15 @@ cmd_test() {
 			else
 				read -r -p "$prompt" -e line
 			fi
-			if [[ $line == *\\ ]]; then
-				input+="${line%\\}"$'\n'
+			local count=0
+			while [[ ${line: -1} == "\\" ]]; do
+				line="${line%\\}"
+				((count++))
+			done
+			local i
+			for ((i=0; i<count/2; i++)); do line+="\\"; done
+			if (( count % 2 )); then
+				input+="$line"$'\n'
 				prompt="   "
 			else
 				input+="$line"
@@ -232,7 +239,7 @@ cmd_test() {
 		done
 		local expected=$(tr '[a-z]' '[A-Z]' <<< "$answer")
 		local actual=$(tr '[a-z]' '[A-Z]' <<< "$input")
-		if [[ ${actual} == ${expected} ]]; then
+		if [[ "$actual" == "$expected" ]]; then
 			[[ $non_interactive -eq 0 ]] && tput setaf 2
 			echo "OK"
 		else

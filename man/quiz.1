@@ -59,7 +59,10 @@ Initialize new quiz storage.
 Walk every quiz in the store, prompting for an answer and comparing it to the
 stored one (case-insensitive). End a line with a backslash (\fI\\\fP) to continue
 the answer on the next line, for quizzes whose stored answer spans multiple
-lines. If \fI--non-interactive\fP is specified, ANSI
+lines. To enter a literal trailing backslash, double it (\fI\\\\\fP): \fI2n\fP
+trailing backslashes become \fIn\fP literal backslashes, and \fI2n+1\fP become
+\fIn\fP literal backslashes plus a line continuation. If \fI--non-interactive\fP
+is specified, ANSI
 color output is suppressed and the command exits non-zero if any answer is
 wrong, suitable for CI use. If \fI--filter\fP is specified, the set of quizzes
 is restricted by running the script at \fI$QUIZ_STORE_DIR/.filters/<name>.bash\fP,

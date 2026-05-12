@@ -40,7 +40,7 @@ Quiz store initialized
 
 ### Test yourself
 
-`quiz test` (or just `quiz` with no arguments) walks every quiz interactively, comparing your answer to the stored one. Answers are case-insensitive. End a line with `\` to continue the answer on the next line — useful for quizzes whose stored answer spans multiple lines.
+`quiz test` (or just `quiz` with no arguments) walks every quiz interactively, comparing your answer to the stored one. Answers are case-insensitive. End a line with `\` to continue the answer on the next line — useful for quizzes whose stored answer spans multiple lines. To enter a literal trailing backslash, double it (`\\`); generally, `2n` trailing backslashes are treated as `n` literal backslashes and `2n+1` are `n` literal backslashes plus a line continuation.
 
 ````bash
 $ quiz test
